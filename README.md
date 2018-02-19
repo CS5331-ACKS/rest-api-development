@@ -96,16 +96,19 @@ Please fill out this section with details relevant to your team.
 
 ### Team Members
 
-1. Member 1 Name
-2. Member 2 Name
-3. Member 3 Name
-4. Member 4 Name
+1. Andy Tan Guan Ming
+2. Zhu Chunqi
+3. Lu Yang Kenneth
+4. Si Kai Ng
 
 ### Short Answer Questions
 
 #### Question 1: Briefly describe the web technology stack used in your implementation.
 
-Answer: Please replace this sentence with your answer.
+Database - Sqlite was used due to its excellent reputation as an embedded
+database and ease of use.
+
+TODO: Frontend and Flask
 
 #### Question 2: Are there any security considerations your team thought about?
 
@@ -131,13 +134,12 @@ Answer: Please replace this sentence with your answer.
 
 #### Please declare your individual contributions to the assignment:
 
-1. Member 1 Name
-    - Integrated feature x into component y
-    - Implemented z
-2. Member 2 Name
-    - Wrote the front-end code
-3. Member 3 Name
-    - Designed the database schema
-4. Member 4 Name
-    - Implemented x
-
+1. Andy Tan Guan Ming
+    - TODO
+2. Zhu Chunqi
+    - Designed the database schema for `users` table
+    - Implemented the `/users/*` endpoints
+3. Lu Yang Kenneth
+    - TODO
+4. Ng Si Kai
+    - TODO
