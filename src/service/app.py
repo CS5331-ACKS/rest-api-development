@@ -53,7 +53,6 @@ def get_db():
 
 def init_db(db):
     """Initialize Sqlite3 database"""
-    print("Initializing database schema")
     with app.app_context():
         with app.open_resource('schema.sql', mode='r') as file:
             db.cursor().executescript(file.read())
@@ -88,10 +87,11 @@ def meta_members():
 @app.route("/users/register", methods=["POST"])
 def users_register():
     if request.method == 'POST':
-        username = request.form.get("username")
-        password = request.form.get("password")
-        fullname = request.form.get("fullname")
-        age = request.form.get("age")
+        post_data = request.get_json() or {}
+        username = post_data.get("username")
+        password = post_data.get("password")
+        fullname = post_data.get("fullname")
+        age = post_data.get("age")
 
         # All parameters are required
         if None in [username, password, fullname, age]:
@@ -110,10 +110,12 @@ def users_register():
         try:
             get_db().execute('INSERT INTO users VALUES(?,?,?,?)',
             [username, password, fullname, age])
+            print("Inserted user {%s, %s, %s, %d}" %
+            (username, password, fullname, age))
         except sqlite3.IntegrityError:
             data = {'error': 'User already exists!'}
             return make_json_response(data)
-        return make_json_response(None, status=201)
+        return make_json_response(None, code=201)
 
 if __name__ == '__main__':
     # Change the working directory to the script directory
