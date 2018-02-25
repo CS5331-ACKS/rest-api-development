@@ -1,26 +1,104 @@
-<html>
-    <head>
-    </head>
-    <body>
-        <h1>Secret Diary Front End</h1>
-        <p>Requirements for the front end are as follows:</p>
-        <ul>
-            <li>Register a user</li>
-            <li>Login</li>
-            <li>Logout</li>
-            <li>Display all public diary entries</li>
-            <li>Display an authenticated user's diary entries</li>
-            <li>Create a new diary entry</li>
-            <li>Delete an existing diary entry</li>
-            <li>Toggle the permissions on an existing diary entry</li>
-        </ul>
-        <!-- the following is a demo on how you may display data retrieved from
-             the API
-        -->
-        <div id="demo_heartbeat">
-        </div>
-        <div id="demo_members">
-        </div>
-        <script src="./demo.js"></script>
-    </body>
+<link rel="stylesheet" href="/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="/css/bootstrap-table.min.css"/>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/bootstrap-table.min.js"></script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <ul class="navbar-nav">
+    <li class="nav-item active">
+      <a class="nav-link" href="registration.html">Register</a>
+    </li>
+    <li class="nav-item active">
+      <a class="nav-link" href="public_list.html">View public diary entries</a>
+    </li>
+  </ul>
+</nav>
+</body>
 </html>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6 mx-auto">
+                    <span class="anchor" id="formLogin"></span>
+                    <!-- form card login -->
+                    <div class="card rounded-0">
+                        <div class="card-header">
+                            <h3 class="mb-0">Secret Diary Login</h3>
+                        </div>
+
+                        <div class="card-body">
+                            <form class="form" role="form" autocomplete="off" id="formAuthenticate">
+                                <div class="form-group">
+                                    <label>Username</label>
+                                    <input type="text" class="form-control form-control-lg rounded-0" name="username" id="username" required="">
+                                </div>
+                                <div class="form-group">
+                                    <label>Password</label>
+                                    <input type="password" class="form-control form-control-lg rounded-0" name="password" id="password" required="">
+                                </div>
+                                    <input type="button" id="submit" class="btn btn-success btn-lg float-right" value="Login">
+
+                            </form>
+                        </div>
+                        <!--/card-block-->
+                    </div>
+                    <!-- /form card login -->
+
+                </div>
+
+
+            </div>
+            <!--/row-->
+
+        </div>
+        <!--/col-->
+    </div>
+    <!--/row-->
+</div>
+<!--/container-->
+
+<script>
+    $(document).ready(function(){
+         // click on button submit
+        $("#submit").on('click', function(){
+
+          var user = document.getElementById("username").value
+          var pwd = document.getElementById("password").value
+          var formData = `{\"username\": "${user}",\"password\": "${pwd}"}`;
+
+        //  var formData = JSON.stringify($("#formAuthenticate").serializeArray());
+        //  var ret = formData.replace('[{"name":','');
+        //  alert(ret);
+
+            // send ajax
+            $.ajax({
+                url: 'http://localhost:8080/users/authenticate', // url where to submit the request
+                type : "POST", // type of action POST || GET
+                dataType : 'json', // data type
+                data : formData,
+                contentType: "application/json",
+                async: false,
+                success : function(result) {
+
+                    console.log(result);
+
+                },
+                error: function(xhr, resp, text) {
+                    console.log(xhr, resp, text);
+                }
+            })
+        });
+    });
+
+</script>
