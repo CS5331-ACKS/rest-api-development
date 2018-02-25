@@ -6,6 +6,7 @@ CREATE TABLE users(
 );
 
 CREATE TABLE tokens(
+  username TEXT REFERENCES users(username),
   token TEXT PRIMARY KEY,
   expired BOOLEAN NOT NULL
 )

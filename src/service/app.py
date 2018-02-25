@@ -28,6 +28,9 @@ def get_db():
         # Set isolation_level=None for autocommit after each API call processed
         db = g._database = sqlite3.connect(DATABASE, isolation_level=None)
 
+        # Set row factory to sqlite3.Row to get associative result sets
+        db.row_factory = sqlite3.Row
+
         if init_flag:
             init_db(db)
     return db
@@ -94,6 +97,38 @@ def meta_members():
         }
         return make_json_response(data)
 
+@app.route("/users", methods=["POST"])
+def users():
+    if request.method == "POST":
+        post_data = request.get_json() or {}
+        token = post_data.get("token")
+
+        # All parameters are required
+        if None in [token]:
+            return respond_missing_params()
+
+        # Check token validity and if expired
+        try:
+            cursor = get_db().execute(
+            "SELECT username, fullname, age FROM tokens NATURAL JOIN users WHERE token=?", [token])
+            row = cursor.fetchone()
+            if row is not None:
+                data = {
+                    "status": True,
+                    "username": row["username"],
+                    "fullname": row["fullname"],
+                    "age": row["age"]
+                }
+                return make_json_response(data)
+            else:
+                data = {
+                    "status": False,
+                    "error": "Invalid authentication token."
+                }
+                return make_json_response(data)
+        except sqlite3.Error as e:
+            print("sqlite3 error: %s" % e)
+
 @app.route("/users/register", methods=["POST"])
 def users_register():
     if request.method == 'POST':
@@ -156,8 +191,10 @@ def users_authenticate():
                 token = str(uuid.uuid4())
                 try:
                     get_db().execute(
-                    'INSERT INTO tokens VALUES (?, ?)', [token, False])
-                    print("Inserted token (%s, %s)" % (token, False))
+                    'INSERT INTO tokens VALUES (?, ?, ?)',
+                    [username, token, False])
+                    print("Inserted token (%s, %s, %s)" %
+                    (username, token, False))
                     # Authentication successful response
                     data = {
                         'status': True,

@@ -8,6 +8,29 @@
 	"item": [
 		{
 			"name": "Get Endpoint List",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "20110b3f-47dd-4f14-83ab-a83be511cac2",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Result is correct\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.result).to.eql([",
+							"        \"/\",",
+							"        \"/meta/heartbeat\",",
+							"        \"/meta/members\"",
+							"    ]);",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -372,7 +395,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\": \"test\",\n\t\"password\": \"pass\"\n}"
+					"raw": "{\n\t\"username\": \"{{TEST_USER}}\",\n\t\"password\": \"{{TEST_PASS}}\"\n}"
 				},
 				"url": {
 					"raw": "http://127.0.0.1:8080/users/authenticate",
@@ -567,6 +590,137 @@
 					"path": [
 						"users",
 						"expire"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Authenticated User (Missing Params)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ecd2b459-2122-4d12-bae6-89fcc8819fda",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is false\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(false);",
+							"});",
+							"",
+							"pm.test(\"Error is missing parameters\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql(\"Missing required parameter(s)\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/users",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"users"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Authenticated User (Success)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "abe890d2-19b1-4b02-b0f1-6a95693b4064",
+						"type": "text/javascript",
+						"exec": [
+							"pm.sendRequest({",
+							"    url: \"http://127.0.0.1:8080/users/authenticate\",",
+							"    method: \"POST\",",
+							"    header: \"content-type: application/json\",",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"username\": pm.globals.get(\"TEST_USER\"),",
+							"            \"password\": pm.globals.get(\"TEST_PASS\")",
+							"        })",
+							"    }",
+							"}, function (err, response) {",
+							"    var token = response.json().token;",
+							"    pm.globals.set(\"TEST_TOKEN\", token);",
+							"    console.log(token);",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "7a33e53f-8719-42ee-9125-e4d82727ebe6",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is true\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(true);",
+							"});",
+							"",
+							"pm.test(\"User attributes are correct\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.username).to.eql(pm.globals.get(\"TEST_USER\"));",
+							"    pm.expect(jsonData.fullname).to.eql(pm.globals.get(\"TEST_FULLNAME\"));",
+							"    pm.expect(jsonData.age).to.eql(parseInt(pm.globals.get(\"TEST_AGE\")));",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"{{TEST_TOKEN}}\"\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/users",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"users"
 					]
 				},
 				"description": ""
