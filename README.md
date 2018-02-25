@@ -135,7 +135,7 @@ Answer: Please replace this sentence with your answer.
 #### Please declare your individual contributions to the assignment:
 
 1. Andy Tan Guan Ming
-    - TODO
+    - Implemented frontend for login, registration and public diary entries
 2. Zhu Chunqi
     - Designed the database schema for `users` table
     - Implemented the `/users/*` endpoints
