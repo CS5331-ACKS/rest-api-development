@@ -170,7 +170,37 @@ def users_authenticate():
             print("sqlite3 error: %s" % e)
 
         # Authentication failed response
-        return make_json_response({'status': False}, status=200)
+        return make_json_response({'status': False})
+
+@app.route("/users/expire", methods=["POST"])
+def users_expire():
+    if request.method == 'POST':
+        print(request.method)
+        post_data = request.get_json() or {}
+        token = post_data.get('token')
+
+        # All parameters are required
+        if None in [token]:
+            return respond_missing_params()
+        else:
+            # Validate UUIDv4 token
+            try:
+                uuid.UUID(str(token), version=4)
+            except ValueError as e:
+                print('Invalid UUIDv4 token')
+                return make_json_response({'status': False})
+
+        # Expire the token
+        try:
+            cursor = get_db().execute(
+            "UPDATE tokens SET expired='true' WHERE token=?", [token])
+            if cursor.rowcount == 0:
+                # Token did not exist in database
+                return make_json_response({'status': False})
+            else:
+                return make_json_response({'status': True})
+        except sqlite3.Error as e:
+            print("sqlite3 error: %s" % e)
 
 if __name__ == '__main__':
     # Change the working directory to the script directory
