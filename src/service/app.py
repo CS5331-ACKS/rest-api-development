@@ -16,30 +16,11 @@ ENDPOINT_LIST = ['/', '/meta/heartbeat', '/meta/members']
 
 DATABASE = 'database.db'
 
-def make_json_response(data, status=True, code=200):
-    """Utility function to create the JSON responses."""
-
-    to_serialize = {}
-    if status:
-        to_serialize['status'] = True
-        if data is not None:
-            to_serialize['result'] = data
-    else:
-        to_serialize['status'] = False
-        to_serialize['error'] = data
-    response = app.response_class(
-        response=json.dumps(to_serialize),
-        status=code,
-        mimetype='application/json'
-    )
-    return response
-
 ### DATABASE Functionalities ###
 
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        print("Setting up database connection")
         # Need to call init_db to load schema if database file was not found
         # Note: connect() automatically creates file if not exists
         init_flag = not os.path.isfile(DATABASE)
@@ -63,18 +44,43 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
+### Response Helpers ###
+
+def make_json_response(data, status=200):
+    """Utility function to create the JSON responses."""
+    response = app.response_class(
+        response=json.dumps(data),
+        status=status,
+        mimetype='application/json'
+    )
+    return response
+
+def respond_missing_params():
+    data = {
+        'error': 'Missing required parameter(s)',
+        'status': False
+    }
+    return make_json_response(data)
+
 ### API Routes ###
 
 @app.route("/")
 def index():
     """Returns a list of implemented endpoints."""
-    return make_json_response(ENDPOINT_LIST)
+    data = {
+        'status': True,
+        'result': ENDPOINT_LIST
+    }
+    return make_json_response(data)
 
 
 @app.route("/meta/heartbeat")
 def meta_heartbeat():
     """Returns true"""
-    return make_json_response(None)
+    data = {
+        'status': True
+    }
+    return make_json_response(data)
 
 
 @app.route("/meta/members")
@@ -82,7 +88,11 @@ def meta_members():
     """Returns a list of team members"""
     with open("./team_members.txt") as f:
         team_members = f.read().strip().split("\n")
-    return make_json_response(team_members)
+        data = {
+            'status': True,
+            'result': team_members
+        }
+        return make_json_response(data)
 
 @app.route("/users/register", methods=["POST"])
 def users_register():
@@ -95,14 +105,16 @@ def users_register():
 
         # All parameters are required
         if None in [username, password, fullname, age]:
-            data = {'error': 'Missing required parameter(s)'}
-            return make_json_response(data)
+            return respond_missing_params()
         else:
             # Perform input validation
             try:
                 age = int(age)
             except ValueError:
-                data = {'error': 'Age must be a positive integer'}
+                data = {
+                    'status': False,
+                    'error': 'Age must be a positive integer'
+                }
                 return make_json_response(data)
 
         # Attempts to insert the user into the database
@@ -113,9 +125,52 @@ def users_register():
             print("Inserted user {%s, %s, %s, %d}" %
             (username, password, fullname, age))
         except sqlite3.IntegrityError:
-            data = {'error': 'User already exists!'}
+            data = {
+                'status': False,
+                'error': 'User already exists!'
+            }
             return make_json_response(data)
-        return make_json_response(None, code=201)
+
+        # User created response
+        return make_json_response({'status': True}, status=201)
+
+@app.route("/users/authenticate", methods=["POST"])
+def users_authenticate():
+    if request.method == 'POST':
+        post_data = request.get_json() or {}
+        username = post_data.get('username')
+        password = post_data.get('password')
+
+        # All parameters are required
+        if None in [username, password]:
+            return respond_missing_params()
+
+        # Authenticate user
+        try:
+            cursor = get_db().execute(
+            'SELECT fullname FROM users WHERE username=? AND password=?',
+            [username, password])
+            if len(cursor.fetchall()) == 1:
+                print("User successfully authenticated")
+                # Generate new UUIDv4 token
+                token = str(uuid.uuid4())
+                try:
+                    get_db().execute(
+                    'INSERT INTO tokens VALUES (?, ?)', [token, False])
+                    print("Inserted token (%s, %s)" % (token, False))
+                    # Authentication successful response
+                    data = {
+                        'status': True,
+                        'token': token
+                    }
+                    return make_json_response(data)
+                except sqlite3.Error as e:
+                    print("sqlite3 error: %s" % e)
+        except sqlite3.Error as e:
+            print("sqlite3 error: %s" % e)
+
+        # Authentication failed response
+        return make_json_response({'status': False}, code=200)
 
 if __name__ == '__main__':
     # Change the working directory to the script directory
