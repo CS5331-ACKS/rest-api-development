@@ -170,7 +170,7 @@ def users_authenticate():
             print("sqlite3 error: %s" % e)
 
         # Authentication failed response
-        return make_json_response({'status': False}, code=200)
+        return make_json_response({'status': False}, status=200)
 
 if __name__ == '__main__':
     # Change the working directory to the script directory
