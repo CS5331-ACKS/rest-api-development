@@ -3,6 +3,7 @@
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/bootstrap-table.min.js"></script>
+<script src="/js/registration.js"></script>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -53,7 +54,7 @@
 
   				<div class="form-group">
                                     <label for="password">Password</label>
-                                    <input type="password" class="form-control" id="password" title="At least 6 characters with letters and numbers" required="">
+                                    <input type="password" class="form-control" id="password" required="">
                                 </div>
 
                                 <div class="form-group">
@@ -80,40 +81,3 @@
 </div>
 <!--/container-->
 </form>
-
-
-<script>
-    $(document).ready(function(){
-         // click on button submit
-        $("#submit").on('click', function(){
-
-          var username = document.getElementById("username").value
-          var password = document.getElementById("password").value
-          var fullname = document.getElementById("fullname").value
-          var age = document.getElementById("age").value
-          var formData = `{\"username\": "${username}",\"password\": "${password}",\"fullname\": "${fullname}",\"age\": ${age}}`;
-
-        //  var formData = JSON.stringify($("#formAuthenticate").serializeArray());
-      ;
-
-            // send ajax
-            $.ajax({
-                url: 'http://localhost:8080/users/register', // url where to submit the request
-                type : "POST", // type of action POST || GET
-                dataType : 'json', // data type
-                data : formData,
-                contentType: "application/json",
-                async: false,
-                success : function(result) {
-
-                    console.log(result);
-
-                },
-                error: function(xhr, resp, text) {
-                    console.log(xhr, resp, text);
-                }
-            })
-        });
-    });
-
-</script>
