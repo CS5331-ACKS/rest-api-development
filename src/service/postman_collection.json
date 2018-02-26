@@ -519,6 +519,97 @@
 			"response": []
 		},
 		{
+			"name": "Expire Token (Token Already Expired)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "de6ea6e1-c4e6-4011-bf4d-7ca7b30f3bf9",
+						"type": "text/javascript",
+						"exec": [
+							"pm.sendRequest({",
+							"    url: \"http://127.0.0.1:8080/users/authenticate\",",
+							"    method: \"POST\",",
+							"    header: \"content-type: application/json\",",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"username\": pm.globals.get(\"TEST_USER\"),",
+							"            \"password\": pm.globals.get(\"TEST_PASS\")",
+							"        })",
+							"    }",
+							"}, function (err, response) {",
+							"    var token = response.json().token;",
+							"    pm.globals.set(\"TEST_EXPIRED_TOKEN\", token);",
+							"    console.log(\"Authenticated token: \" + token);",
+							"});",
+							"",
+							"pm.sendRequest({",
+							"    url: \"http://127.0.0.1:8080/users/expire\",",
+							"    method: \"POST\",",
+							"    header: \"content-type: application/json\",",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"token\": pm.globals.get(\"TEST_EXPIRED_TOKEN\")",
+							"        })",
+							"    }",
+							"}, function (err, response) {",
+							"    console.log(\"Token expired\");",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e759670f-6849-468e-be39-db4447f1e912",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is false\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(false);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"{{TEST_EXPIRED_TOKEN}}\"\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/users/expire",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"expire"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Expire Token (Success - Unique Token)",
 			"event": [
 				{
@@ -626,6 +717,101 @@
 				"method": "POST",
 				"header": [],
 				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/users",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"users"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Authenticated User (Expired Token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5f9cf822-50dc-466a-9592-7bac0f575998",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is false\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(false);",
+							"});",
+							"",
+							"pm.test(\"Error is invalid token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql(\"Invalid authentication token.\");",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "beee87d2-2fa4-4152-8a56-880649268e34",
+						"type": "text/javascript",
+						"exec": [
+							"pm.sendRequest({",
+							"    url: \"http://127.0.0.1:8080/users/authenticate\",",
+							"    method: \"POST\",",
+							"    header: \"content-type: application/json\",",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"username\": pm.globals.get(\"TEST_USER\"),",
+							"            \"password\": pm.globals.get(\"TEST_PASS\")",
+							"        })",
+							"    }",
+							"}, function (err, response) {",
+							"    var token = response.json().token;",
+							"    pm.globals.set(\"TEST_EXPIRED_TOKEN\", token);",
+							"    console.log(\"Authenticated token: \" + token);",
+							"});",
+							"",
+							"pm.sendRequest({",
+							"    url: \"http://127.0.0.1:8080/users/expire\",",
+							"    method: \"POST\",",
+							"    header: \"content-type: application/json\",",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"token\": pm.globals.get(\"TEST_EXPIRED_TOKEN\")",
+							"        })",
+							"    }",
+							"}, function (err, response) {",
+							"    console.log(\"Token expired\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"{{TEST_EXPIRED_TOKEN}}\"\n}"
+				},
 				"url": {
 					"raw": "http://127.0.0.1:8080/users",
 					"protocol": "http",
