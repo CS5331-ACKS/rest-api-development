@@ -2,6 +2,7 @@
 
 from flask import Flask, request, g
 from flask_cors import CORS
+import datetime
 import json
 import os
 import sqlite3
@@ -262,11 +263,13 @@ def diary_create():
 
         # Create diary entry
         try:
+            current_time = datetime.datetime.now().replace(microsecond=0).isoformat()
             cursor = get_db().execute(
-            "INSERT INTO diary_entries VALUES(NULL, ?, ?, ?, ?)",
-            [title, public, text, username])
+            "INSERT INTO diary_entries VALUES(NULL, ?, ?, ?, ?, ?)",
+            [title, username, current_time, public, text])
             diary_entry_id = cursor.lastrowid
-            print("Inserted diary entry (%d, %s, %s, ..., %s)" % (diary_entry_id, title, public, username))
+            print("Inserted diary entry (%d, %s, %s, %s, %s, ...)" %
+            (diary_entry_id, title, username, current_time, public))
             data = {
                 "status": True,
                 "id": diary_entry_id
