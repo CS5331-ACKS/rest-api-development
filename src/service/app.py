@@ -78,6 +78,20 @@ def respond_invalid_token():
     }
     return make_json_response(data)
 
+def respond_invalid_id():
+    data = {
+        "status": False,
+        "error": "Invalid diary entry id."
+    }
+    return make_json_response(data)
+
+def respond_invalid_public():
+    data = {
+        "status": False,
+        "error": "Invalid value for public."
+    }
+    return make_json_response(data)
+
 ### API Routes ###
 
 @app.route("/")
@@ -290,19 +304,11 @@ def diary_create():
         # All parameters are required
         if None in [token, title, public, text]:
             return respond_missing_params()
-        else:
-            # Validate acceptable values for public attribute
-            try:
-                public = int(public)
-                if public not in [0, 1]:
-                    raise ValueError("Value of public must be 0 or 1")
-            except ValueError as e:
-                print("Value of public is not 0 or 1")
-                data = {
-                    "status": False,
-                    "error": "Invalid value for public."
-                }
-                return make_json_response(data)
+
+        # Validate value of public
+        is_public_valid, public = validate_public(public)
+        if not is_public_valid:
+            return respond_invalid_public()
 
         # Validate UUIDv4 token and check if token is not expired
         is_token_valid, username = validate_token(token)
@@ -312,7 +318,6 @@ def diary_create():
         # Create diary entry
         try:
             current_time = datetime.datetime.now().replace(microsecond=0).isoformat()
-            public = bool(public == 1)
             cursor = get_db().execute(
             "INSERT INTO diary_entries VALUES(NULL, ?, ?, ?, ?, ?)",
             [title, username, current_time, public, text])
@@ -344,29 +349,55 @@ def diary_delete():
             return respond_invalid_token()
 
         # Validate diary entry id
-        invalid_id_data = {
-            "status": False,
-            "error": "Invalid diary entry id."
-        }
+        if not validate_id(username, id):
+            return respond_invalid_id()
+
         try:
             id = int(id)
             cursor = get_db().execute(
-            "SELECT * FROM diary_entries WHERE author = ? AND id = ?",
+            "DELETE FROM diary_entries WHERE author = ? AND id = ? LIMIT 1",
             [username, id])
-            row = cursor.fetchone()
-            if row is None:
-                # Diary entry id is invalid or does not belong to user
-                return make_json_response(invalid_id_data)
-            else:
-                cursor = get_db().execute(
-                "DELETE FROM diary_entries WHERE author = ? AND id = ? LIMIT 1",
-                [username, id])
-                print("Deleted diary entry (%d, ..., %s, ..., ..., ...)" %
-                (id, username))
-                return make_json_response({"status": True})
-        except ValueError as e:
-            print("Diary entry id is not an integer")
-            return make_json_response(invalid_id_data)
+            print("Deleted diary entry (%d, ..., %s, ..., ..., ...)" %
+            (id, username))
+            return make_json_response({"status": True})
+        except sqlite3.Error as e:
+            print("sqlite3 error: %s" % e)
+
+        # Assume validation failure response
+        return make_json_response({"status": False})
+
+@app.route("/diary/permission", methods=["POST"])
+def diary_permission():
+    if request.method == 'POST':
+        post_data = request.get_json() or {}
+        token = post_data.get("token")
+        id = post_data.get("id")
+        public = post_data.get("public")
+
+        # All parameters are required
+        if None in [token, id, public]:
+            return respond_missing_params()
+
+        # Validate UUIDv4 token and check if token is not expired
+        is_token_valid, username = validate_token(token)
+        if not is_token_valid:
+            return respond_invalid_token()
+
+        # Validate diary entry id
+        if not validate_id(username, id):
+            return respond_invalid_id()
+
+        # Validate value of public
+        is_public_valid, public = validate_public(public)
+        if not is_public_valid:
+            return respond_invalid_public()
+
+        # Modify the permission on the diary entry
+        try:
+            cursor = get_db().execute(
+            "UPDATE diary_entries SET public = ? WHERE author = ? AND id = ?",
+            [public, username, id])
+            return make_json_response({"status": True})
         except sqlite3.Error as e:
             print("sqlite3 error: %s" % e)
 
@@ -422,6 +453,32 @@ def validate_token(token):
             return True, rows[0]["username"]
     except sqlite3.Error as e:
         print("sqlite3 error: %s" % e)
+        return False, None
+
+def validate_id(username, id):
+    try:
+        id = int(id)
+        cursor = get_db().execute(
+        "SELECT * FROM diary_entries WHERE author = ? AND id = ?",
+        [username, id])
+        row = cursor.fetchone()
+        if row is None:
+            # Diary entry id is invalid or does not belong to user
+            return False
+        else:
+            return True
+    except ValueError as e:
+        print("Id is not an integer")
+        return False
+    except sqlite3.Error as e:
+        print("sqlite3 error: %s" % e)
+        return False
+
+def validate_public(public):
+    if isinstance(public, bool):
+        return True, public
+    else:
+        print("Value of public is not True or False")
         return False, None
 
 if __name__ == '__main__':

@@ -998,7 +998,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"token\": \"INVALID\",\n\t\"title\": \"{{TEST_TITLE}}\",\n\t\"public\": 0,\n\t\"text\": \"{{TEST_TEXT}}\"\n}"
+					"raw": "{\n\t\"token\": \"INVALID\",\n\t\"title\": \"{{TEST_TITLE}}\",\n\t\"public\": false,\n\t\"text\": \"{{TEST_TEXT}}\"\n}"
 				},
 				"url": {
 					"raw": "http://127.0.0.1:8080/diary/create",
@@ -1138,7 +1138,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"token\": \"{{TEST_TOKEN}}\",\n\t\"title\": \"{{TEST_TITLE}}\",\n\t\"public\": \"1\",\n\t\"text\": \"{{TEST_TEXT}}\"\n}"
+					"raw": "{\n\t\"token\": \"{{TEST_TOKEN}}\",\n\t\"title\": \"{{TEST_TITLE}}\",\n\t\"public\": true,\n\t\"text\": \"{{TEST_TEXT}}\"\n}"
 				},
 				"url": {
 					"raw": "http://127.0.0.1:8080/diary/create",
@@ -1449,7 +1449,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "397af624-30f8-4aa9-ae36-cfac403fce0c",
+						"id": "da304acd-ee84-4811-87af-53878d46c26c",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -1458,7 +1458,7 @@
 							"",
 							"pm.test(\"Result is present\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.results).to.not.eql(undefined);",
+							"    pm.expect(jsonData.result).to.not.eql(undefined);",
 							"});"
 						]
 					}
@@ -1621,7 +1621,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7afaf416-2397-4f6f-87ae-ff1a303376d9",
+						"id": "16ec4fa7-9318-4eb9-a982-6a8ce4907f1e",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -1630,7 +1630,7 @@
 							"",
 							"pm.test(\"Result is present\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.results).to.not.eql(undefined);",
+							"    pm.expect(jsonData.result).to.not.eql(undefined);",
 							"});"
 						]
 					}
@@ -1660,6 +1660,290 @@
 					"port": "8080",
 					"path": [
 						"diary"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Set Diary Entry Permission (Missing Params)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "67ee3d84-bf15-42b5-b017-f0a1d5791309",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is false\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(false);",
+							"});",
+							"",
+							"pm.test(\"Error is missing parameters\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql(\"Missing required parameter(s)\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary/permission",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary",
+						"permission"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Set Diary Entry Permission (Invalid Token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "68619383-a440-45d9-85fa-dc01c9344b99",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is false\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(false);",
+							"});",
+							"",
+							"pm.test(\"Error is invalid token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql(\"Invalid authentication token.\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"{{TEST_INVALID_TOKEN}}\",\n\t\"id\": 9999,\n\t\"public\": false\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary/permission",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary",
+						"permission"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Set Diary Entry Permission (Invalid Id)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b14f392-dcc7-4b21-a69d-ae80d073a98e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is false\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(false);",
+							"});",
+							"",
+							"pm.test(\"Error is invalid token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql(\"Invalid diary entry id.\");",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3d2bb120-14e9-49d3-9391-e31330a22d50",
+						"type": "text/javascript",
+						"exec": [
+							"pm.sendRequest({",
+							"    url: \"http://127.0.0.1:8080/users/authenticate\",",
+							"    method: \"POST\",",
+							"    header: \"content-type: application/json\",",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"username\": pm.globals.get(\"TEST_USER\"),",
+							"            \"password\": pm.globals.get(\"TEST_PASS\")",
+							"        })",
+							"    }",
+							"}, function (err, response) {",
+							"    var token = response.json().token;",
+							"    pm.globals.set(\"TEST_TOKEN\", token);",
+							"    console.log(token);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"{{TEST_TOKEN}}\",\n\t\"id\": 9999,\n\t\"public\": false\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary/permission",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary",
+						"permission"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Set Diary Entry Permission (Success)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a8394088-c642-4421-8aeb-47dc02d21540",
+						"type": "text/javascript",
+						"exec": [
+							"pm.sendRequest({",
+							"    url: \"http://127.0.0.1:8080/users/authenticate\",",
+							"    method: \"POST\",",
+							"    header: \"content-type: application/json\",",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"username\": pm.globals.get(\"TEST_USER\"),",
+							"            \"password\": pm.globals.get(\"TEST_PASS\")",
+							"        })",
+							"    }",
+							"}, function (err, response) {",
+							"    var token = response.json().token;",
+							"    pm.globals.set(\"TEST_TOKEN\", token);",
+							"    console.log(token);",
+							"    ",
+							"    pm.sendRequest({",
+							"        url: \"http://127.0.0.1:8080/diary/create\",",
+							"        method: \"POST\",",
+							"        header: \"content-type: application/json\",",
+							"        body: {",
+							"            mode: \"raw\",",
+							"            raw: JSON.stringify({",
+							"                \"token\": pm.globals.get(\"TEST_TOKEN\"),",
+							"                \"title\": pm.globals.get(\"TEST_TITLE\"),",
+							"                \"public\": true,",
+							"                \"text\": pm.globals.get(\"TEST_TEXT\")",
+							"            })",
+							"        }",
+							"    }, function (err, response) {",
+							"        var result = response.json().result;",
+							"        pm.globals.set(\"TEST_ENTRY_ID\", parseInt(result));",
+							"        console.log(result);",
+							"    });",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "eb035d30-d76d-46cc-aa7b-6a8a90bd21ec",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is true\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(true);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"{{TEST_TOKEN}}\",\n\t\"id\": {{TEST_ENTRY_ID}},\n\t\"public\": true\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary/permission",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary",
+						"permission"
 					]
 				},
 				"description": ""
