@@ -60,8 +60,15 @@ def make_json_response(data, status=200):
 
 def respond_missing_params():
     data = {
-        'error': 'Missing required parameter(s)',
-        'status': False
+        "status": False,
+        "error": "Missing required parameter(s)",
+    }
+    return make_json_response(data)
+
+def respond_invalid_token():
+    data = {
+        "status": False,
+        "error": "Invalid authentication token."
     }
     return make_json_response(data)
 
@@ -181,63 +188,138 @@ def users_authenticate():
             return respond_missing_params()
 
         # Authenticate user
-        try:
-            cursor = get_db().execute(
-            'SELECT fullname FROM users WHERE username=? AND password=?',
-            [username, password])
-            if len(cursor.fetchall()) == 1:
-                print("User successfully authenticated")
-                # Generate new UUIDv4 token
-                token = str(uuid.uuid4())
-                try:
-                    get_db().execute(
-                    'INSERT INTO tokens VALUES (?, ?, ?)',
-                    [username, token, False])
-                    print("Inserted token (%s, %s, %s)" %
-                    (username, token, False))
-                    # Authentication successful response
-                    data = {
-                        'status': True,
-                        'token': token
-                    }
-                    return make_json_response(data)
-                except sqlite3.Error as e:
-                    print("sqlite3 error: %s" % e)
-        except sqlite3.Error as e:
-            print("sqlite3 error: %s" % e)
+        if authenticate_user(username, password):
+            token = generate_token(username)
+            if token is not None:
+                # Authentication successful response
+                data = {
+                    "status": True,
+                    "token": token
+                }
+                return make_json_response(data)
 
-        # Authentication failed response
-        return make_json_response({'status': False})
+        # Assume authentication failed
+        return make_json_response({"status": False})
 
 @app.route("/users/expire", methods=["POST"])
 def users_expire():
     if request.method == 'POST':
-        print(request.method)
         post_data = request.get_json() or {}
         token = post_data.get('token')
 
         # All parameters are required
         if None in [token]:
             return respond_missing_params()
-        else:
-            # Validate UUIDv4 token
-            try:
-                uuid.UUID(str(token), version=4)
-            except ValueError as e:
-                print('Invalid UUIDv4 token')
-                return make_json_response({'status': False})
+
+        # Validate UUIDv4 token
+        if not validate_token(token):
+            return respond_invalid_token()
 
         # Expire the token
         try:
             cursor = get_db().execute(
-            "UPDATE tokens SET expired=1 WHERE token=? AND expired=0", [token])
+            "UPDATE tokens SET expired = 1 WHERE token = ? AND expired = 0", [token])
             if cursor.rowcount == 0:
                 # Token did not exist in database or was already expired
                 return make_json_response({'status': False})
             else:
+                print("Updated token (%s)" % token)
                 return make_json_response({'status': True})
         except sqlite3.Error as e:
             print("sqlite3 error: %s" % e)
+
+@app.route("/diary/create", methods=["POST"])
+def diary_create():
+    if request.method == 'POST':
+        post_data = request.get_json() or {}
+        token = post_data.get("token")
+        title = post_data.get("title")
+        public = post_data.get("public")
+        text = post_data.get("text")
+
+        # All parameters are required
+        if None in [token, title, public, text]:
+            return respond_missing_params()
+        else:
+            # Validate acceptable values for public attribute
+            try:
+                public = int(public)
+                if public not in [0, 1]:
+                    raise ValueError("Value of public must be 0 or 1")
+            except ValueError as e:
+                print("Value of public is not 0 or 1")
+                data = {
+                    "status": False,
+                    "error": "Invalid value for public."
+                }
+                return make_json_response(data)
+
+        # Validate UUIDv4 token and check if token is valid
+        if not validate_token(token):
+            return respond_invalid_token()
+
+        # Create diary entry
+        try:
+            cursor = get_db().execute(
+            "INSERT INTO diary_entries VALUES(NULL, ?, ?, ?)",
+            [title, public, text])
+            diary_entry_id = cursor.lastrowid
+            print("Inserted diary entry (%d, %s, %s, ...)" % (diary_entry_id, title, public))
+            data = {
+                "status": True,
+                "id": diary_entry_id
+            }
+            return make_json_response(data, status=201)
+        except sqlite3.Error as e:
+            print("sqlite3 error: %s" % e)
+
+### Helper function(s) ###
+
+def authenticate_user(username, password):
+    try:
+        cursor = get_db().execute(
+        "SELECT * FROM users WHERE username = ? AND password = ?",
+        [username, password])
+        if len(cursor.fetchall()) == 1:
+            print("User successfully authenticated")
+            return True
+        else:
+            return False
+    except sqlite3.Error as e:
+        print("sqlite3 error: %s" % e)
+        return False
+
+def generate_token(username):
+    try:
+        token = str(uuid.uuid4())
+        get_db().execute(
+        'INSERT INTO tokens VALUES (?, ?, ?)',
+        [username, token, False])
+        print("Inserted token (%s, %s, False)" % (username, token))
+        return token
+    except sqlite3.Error as e:
+        print("sqlite3 error: %s" % e)
+        return None
+
+def validate_token(token):
+    # Validate UUIDv4 token
+    try:
+        uuid.UUID(str(token), version=4)
+    except ValueError as e:
+        print("Invalid UUIDv4 token")
+        return False
+
+    # Check if token has expired
+    try:
+        cursor = get_db().execute(
+        "SELECT * FROM tokens WHERE token = ? AND expired = 0", [token])
+        if len(cursor.fetchall()) == 0:
+            print("Invalid or expired token (%s)" % token)
+            return False
+        else:
+            return True
+    except sqlite3.Error as e:
+        print("sqlite3 error: %s" % e)
 
 if __name__ == '__main__':
     # Change the working directory to the script directory
