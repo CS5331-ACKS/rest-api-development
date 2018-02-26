@@ -19,6 +19,10 @@ DATABASE = 'database.db'
 
 ### DATABASE Functionalities ###
 
+# Adapters to make sqlite3 store boolean as integers and back
+sqlite3.register_adapter(bool, int)
+sqlite3.register_converter("BOOLEAN", lambda v: v != '0')
+
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
@@ -27,7 +31,8 @@ def get_db():
         init_flag = not os.path.isfile(DATABASE)
 
         # Set isolation_level=None for autocommit after each API call processed
-        db = g._database = sqlite3.connect(DATABASE, isolation_level=None)
+        # Set detect_types=sqlite3.PARSE_DECLTYPES to auto convert custom types
+        db = g._database = sqlite3.connect(DATABASE, isolation_level=None, detect_types=sqlite3.PARSE_DECLTYPES)
 
         # Set row factory to sqlite3.Row to get associative result sets
         db.row_factory = sqlite3.Row
@@ -230,6 +235,49 @@ def users_expire():
         except sqlite3.Error as e:
             print("sqlite3 error: %s" % e)
 
+@app.route("/diary", methods=["GET", "POST"])
+def diary():
+    if request.method == "GET":
+        # Get public diary entries endpoint (GET /diary)
+        try:
+            cursor = get_db().execute("SELECT * FROM diary_entries WHERE public = 1")
+            rows = [dict(row) for row in cursor.fetchall()]
+            data = {
+                "status": True,
+                "results": rows
+            }
+            return make_json_response(data)
+        except sqlite3.Error as e:
+            print("sqlite3 error: %s" % e)
+            return make_json_response({"status": False})
+    elif request.method == "POST":
+        # Get authenticated user diary entries endpoint (POST /diary)
+        post_data = request.get_json() or {}
+        token = post_data.get("token")
+
+        # All parameters are required
+        if None in [token]:
+            return respond_missing_params()
+
+        # Validate UUIDv4 token and check if token is not expired
+        is_token_valid, username = validate_token(token)
+        if not is_token_valid:
+            return respond_invalid_token()
+
+        # Retrieve diary entries belonging to authenticated user
+        try:
+            cursor = get_db().execute(
+            "SELECT * FROM diary_entries WHERE author = ?",
+            [username])
+            rows = [dict(row) for row in cursor.fetchall()]
+            data = {
+                "status": True,
+                "results": rows
+            }
+            return make_json_response(data)
+        except sqlite3.Error as e:
+            print("sqlite3 error: %s" % e)
+
 @app.route("/diary/create", methods=["POST"])
 def diary_create():
     if request.method == 'POST':
@@ -264,6 +312,7 @@ def diary_create():
         # Create diary entry
         try:
             current_time = datetime.datetime.now().replace(microsecond=0).isoformat()
+            public = bool(public == 1)
             cursor = get_db().execute(
             "INSERT INTO diary_entries VALUES(NULL, ?, ?, ?, ?, ?)",
             [title, username, current_time, public, text])

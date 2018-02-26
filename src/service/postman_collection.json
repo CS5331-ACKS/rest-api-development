@@ -1138,7 +1138,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"token\": \"{{TEST_TOKEN}}\",\n\t\"title\": \"{{TEST_TITLE}}\",\n\t\"public\": \"0\",\n\t\"text\": \"{{TEST_TEXT}}\"\n}"
+					"raw": "{\n\t\"token\": \"{{TEST_TOKEN}}\",\n\t\"title\": \"{{TEST_TITLE}}\",\n\t\"public\": \"1\",\n\t\"text\": \"{{TEST_TEXT}}\"\n}"
 				},
 				"url": {
 					"raw": "http://127.0.0.1:8080/diary/create",
@@ -1259,6 +1259,229 @@
 					"path": [
 						"diary",
 						"delete"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Public Diary Entries",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "397af624-30f8-4aa9-ae36-cfac403fce0c",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Result is present\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.results).to.not.eql(undefined);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Authenticated Diary Entries (Missing Params)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e39d593f-6a39-47d3-9e2d-bf110dcb7474",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is false\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(false);",
+							"});",
+							"",
+							"pm.test(\"Error is missing parameters\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql(\"Missing required parameter(s)\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Authenticated Diary Entries (Invalid Token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "217bc0d8-1741-48e7-97b1-d9e51653e2ed",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is false\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(false);",
+							"});",
+							"",
+							"pm.test(\"Error is invalid token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql(\"Invalid authentication token.\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"INVALID\"\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Authenticated Diary Entries (Success)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "61810e28-9e4b-4d9e-af8a-3b1000de81c6",
+						"type": "text/javascript",
+						"exec": [
+							"pm.sendRequest({",
+							"    url: \"http://127.0.0.1:8080/users/authenticate\",",
+							"    method: \"POST\",",
+							"    header: \"content-type: application/json\",",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"username\": pm.globals.get(\"TEST_USER\"),",
+							"            \"password\": pm.globals.get(\"TEST_PASS\")",
+							"        })",
+							"    }",
+							"}, function (err, response) {",
+							"    var token = response.json().token;",
+							"    pm.globals.set(\"TEST_TOKEN\", token);",
+							"    console.log(token);",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "7afaf416-2397-4f6f-87ae-ff1a303376d9",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Result is present\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.results).to.not.eql(undefined);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"{{TEST_TOKEN}}\"\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary"
 					]
 				},
 				"description": ""
