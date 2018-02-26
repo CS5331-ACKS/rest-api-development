@@ -13,7 +13,7 @@
 <body>
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-  <ul class="navbar-nav">
+  <ul class="nav navbar-nav ml-auto">
     <li class="nav-item active">
       <a class="nav-link" href="index.html">Login</a>
     </li>
@@ -25,48 +25,36 @@
 </body>
 
 
-<html>
-<head>
+    <br></br><h1 class="text-left">Public Diary Entry</h1>
 
-  <style media="screen" type="text/css">
-  table {
-      width: 50%;
-  }
-  th {
-      background: #f1f1f1;
-      font-weight: bold;
-      padding: 6px;
-  }
-  td {
-      background: #f9f9f9;
-      padding: 6px;
-  }
-  </style>
-</head>
 
-<br></br>
- <h2>List of public diary entries</h2>
-<table id="myTable">
+<table class="table" id="mytable">
+  <thead>
     <tr>
-        <th>Id</th>
-        <th>Title</th>
-        <th>Author</th>
-        <th>Publish Date</th>
-        <th>Text</th>
+      <th>Id</th>
+      <th>Title</th>
+      <th>Author</th>
+      <th>Publish Date</th>
+      <th>Public</th>
+      <th>Text</th>
     </tr>
+  </thead>
 </table>
+
+
 
 <script type="text/javascript">
 $.ajax({
-    url: 'http://localhost/js/data.json',
+    url: 'http://localhost:8080/diary',
     type : "GET",
     contentType: "application/json",
     dataType: 'json',
     success: function(data) {
 
         for (var i=0; i<data.result.length; i++) {
-            var row = $('<tr><td>' + data.result[i].id + '</td><td>' + data.result[i].title + '</td><td>' + data.result[i].author + '</td><td>' + data.result[i].publish_date + '</td><td>' + data.result[i].text + '</td><td>' + '</td></tr>');
-            $('#myTable').append(row);
+            var row = $('<tr><td>' + data.result[i].id + '</td><td>' + data.result[i].title + '</td><td>' + data.result[i].author + '</td><td>' + data.result[i].publish_date +'</td><td>' + data.result[i].public + '</td><td>' + data.result[i].text
+            + '</td><td>' + '</td></tr>');
+            $('#mytable').append(row);
 
         }
     },

@@ -1,11 +1,14 @@
 
     $(document).ready(function(){
          // click on button submit
-        $("#submit").on('click', function(){
+        $("#submit").on('click', function(e){
 
-          var user = document.getElementById("username").value
-          var pwd = document.getElementById("password").value
-          var formData = `{\"username\": "${user}",\"password\": "${pwd}"}`;
+          e.preventDefault();
+          e.returnValue = false;
+
+          var userVar = document.getElementById("username").value;
+          var pwdVar = document.getElementById("password").value;
+          var formData = `{\"username\": "${userVar}",\"password\": "${pwdVar}"}`;
 
 
           if (document.getElementById("username").value == "" || document.getElementById("password").value == "")
@@ -21,8 +24,6 @@
                 dataType : 'json', // data type
                 data : formData,
                 contentType: "application/json",
-                global: false,
-                async: false,
                 success : function(result) {
 
                     console.log(result);
@@ -32,7 +33,7 @@
                     if (result.status == true)
                     {
 
-                      alert("Login successful.");
+                      alert("Login successful!");
                       window.location.href = `userhome.html?${return_first}`;
                     }
                     else if (result.status == false)

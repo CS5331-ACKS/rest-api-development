@@ -1,6 +1,9 @@
     $(document).ready(function(){
          // click on button submit
-        $("#submit").on('click', function(){
+        $("#submit").on('click', function(e){
+
+          e.preventDefault();
+          e.returnValue = false;
 
           if(document.getElementById("password").value != document.getElementById("passwordVerify").value)
           {
@@ -13,11 +16,11 @@
             return;
           }
 
-          var username = document.getElementById("username").value
-          var password = document.getElementById("password").value
-          var fullname = document.getElementById("fullname").value
-          var age = document.getElementById("age").value
-          var formData = `{\"username\": "${username}",\"password\": "${password}",\"fullname\": "${fullname}",\"age\": ${age}}`;
+          var usernameVar = document.getElementById("username").value
+          var passwordVar = document.getElementById("password").value
+          var fullnameVar = document.getElementById("fullname").value
+          var ageVar = document.getElementById("age").value
+          var formData = `{\"username\": "${usernameVar}",\"password\": "${passwordVar}",\"fullname\": "${fullnameVar}",\"age\": ${ageVar}}`;
 
         //  var formData = JSON.stringify($("#formAuthenticate").serializeArray());
 
