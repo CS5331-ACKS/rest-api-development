@@ -211,8 +211,9 @@ def users_expire():
         if None in [token]:
             return respond_missing_params()
 
-        # Validate UUIDv4 token
-        if not validate_token(token):
+        # Validate UUIDv4 token and check if token is not expired
+        is_token_valid, username = validate_token(token)
+        if not is_token_valid:
             return respond_invalid_token()
 
         # Expire the token
@@ -254,17 +255,18 @@ def diary_create():
                 }
                 return make_json_response(data)
 
-        # Validate UUIDv4 token and check if token is valid
-        if not validate_token(token):
+        # Validate UUIDv4 token and check if token is not expired
+        is_token_valid, username = validate_token(token)
+        if not is_token_valid:
             return respond_invalid_token()
 
         # Create diary entry
         try:
             cursor = get_db().execute(
-            "INSERT INTO diary_entries VALUES(NULL, ?, ?, ?)",
-            [title, public, text])
+            "INSERT INTO diary_entries VALUES(NULL, ?, ?, ?, ?)",
+            [title, public, text, username])
             diary_entry_id = cursor.lastrowid
-            print("Inserted diary entry (%d, %s, %s, ...)" % (diary_entry_id, title, public))
+            print("Inserted diary entry (%d, %s, %s, ..., %s)" % (diary_entry_id, title, public, username))
             data = {
                 "status": True,
                 "id": diary_entry_id
@@ -272,6 +274,31 @@ def diary_create():
             return make_json_response(data, status=201)
         except sqlite3.Error as e:
             print("sqlite3 error: %s" % e)
+
+@app.route("/diary/delete", methods=["POST"])
+def diary_delete():
+    if request.method == 'POST':
+        post_data = request.get_json() or {}
+        token = post_data.get("token")
+        id = post_data.get("id")
+
+        # All parameters are required
+        if None in [token, id]:
+            return respond_missing_params()
+
+        # Validate UUIDv4 token and check if token is not expired
+        is_token_valid, username = validate_token(token)
+        if not is_token_valid:
+            return respond_invalid_token()
+
+        # Validate diary entry id
+        try:
+            cursor = "SELECT * FROM diary_entries, tokens,"
+        except sqlite3.Error as e:
+            print("sqlite3 error: %s" % e)
+
+        # Assume validation failure response
+        return make_json_response({"status": False})
 
 ### Helper function(s) ###
 
@@ -307,19 +334,22 @@ def validate_token(token):
         uuid.UUID(str(token), version=4)
     except ValueError as e:
         print("Invalid UUIDv4 token")
-        return False
+        return False, None
 
     # Check if token has expired
     try:
         cursor = get_db().execute(
         "SELECT * FROM tokens WHERE token = ? AND expired = 0", [token])
-        if len(cursor.fetchall()) == 0:
+        rows = cursor.fetchall()
+        if len(rows) == 0:
             print("Invalid or expired token (%s)" % token)
-            return False
+            return False, None
         else:
-            return True
+            print(rows)
+            return True, rows[0]["username"]
     except sqlite3.Error as e:
         print("sqlite3 error: %s" % e)
+        return False, None
 
 if __name__ == '__main__':
     # Change the working directory to the script directory

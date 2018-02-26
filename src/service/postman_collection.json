@@ -1158,6 +1158,112 @@
 				"description": ""
 			},
 			"response": []
+		},
+		{
+			"name": "Delete Diary Entry (Missing Params)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "72fd20d2-45b5-4a26-990c-487d13eb6a59",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is false\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(false);",
+							"});",
+							"",
+							"pm.test(\"Error is missing parameters\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql(\"Missing required parameter(s)\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary/delete",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary",
+						"delete"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Diary Entry (Invalid Token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c50ceb4f-86f9-436a-aa8e-31a8f15d251d",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is false\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(false);",
+							"});",
+							"",
+							"pm.test(\"Error is invalid token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql(\"Invalid authentication token.\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"INVALID\",\n\t\"id\": 1\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary/delete",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary",
+						"delete"
+					]
+				},
+				"description": ""
+			},
+			"response": []
 		}
 	]
 }
