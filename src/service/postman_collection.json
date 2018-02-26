@@ -1082,7 +1082,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f5e2a562-906e-4a76-9d9f-eab06a2a3815",
+						"id": "cebc1dd2-4cdf-4ad1-8104-ca5789ce2686",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 201\", function () {",
@@ -1094,9 +1094,9 @@
 							"    pm.expect(jsonData.status).to.eql(true);",
 							"});",
 							"",
-							"pm.test(\"Id is an integer\", function () {",
+							"pm.test(\"Result is an integer\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(Number.isInteger(jsonData.id)).to.eql(true);",
+							"    pm.expect(Number.isInteger(jsonData.result)).to.eql(true);",
 							"});",
 							""
 						]
@@ -1245,6 +1245,184 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\t\"token\": \"INVALID\",\n\t\"id\": 1\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary/delete",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary",
+						"delete"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Diary Entry (Invalid Id)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "50fe0826-dea1-492e-844e-42bd41c5a37e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.sendRequest({",
+							"    url: \"http://127.0.0.1:8080/users/authenticate\",",
+							"    method: \"POST\",",
+							"    header: \"content-type: application/json\",",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"username\": pm.globals.get(\"TEST_USER\"),",
+							"            \"password\": pm.globals.get(\"TEST_PASS\")",
+							"        })",
+							"    }",
+							"}, function (err, response) {",
+							"    var token = response.json().token;",
+							"    pm.globals.set(\"TEST_TOKEN\", token);",
+							"    console.log(token);",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3543cb93-f98f-4b91-acab-ea4b20257997",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is false\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(false);",
+							"});",
+							"",
+							"pm.test(\"Error is invalid diary entry id\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.eql(\"Invalid diary entry id.\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"{{TEST_TOKEN}}\",\n\t\"id\": 9999\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/diary/delete",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"diary",
+						"delete"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Diary Entry (Success)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f1dd511a-c520-4804-80f2-99ce0fbf9ab9",
+						"type": "text/javascript",
+						"exec": [
+							"pm.sendRequest({",
+							"    url: \"http://127.0.0.1:8080/users/authenticate\",",
+							"    method: \"POST\",",
+							"    header: \"content-type: application/json\",",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"username\": pm.globals.get(\"TEST_USER\"),",
+							"            \"password\": pm.globals.get(\"TEST_PASS\")",
+							"        })",
+							"    }",
+							"}, function (err, response) {",
+							"    var token = response.json().token;",
+							"    pm.globals.set(\"TEST_TOKEN\", token);",
+							"    console.log(token);",
+							"    ",
+							"    pm.sendRequest({",
+							"        url: \"http://127.0.0.1:8080/diary/create\",",
+							"        method: \"POST\",",
+							"        header: \"content-type: application/json\",",
+							"        body: {",
+							"            mode: \"raw\",",
+							"            raw: JSON.stringify({",
+							"                \"token\": pm.globals.get(\"TEST_TOKEN\"),",
+							"                \"title\": pm.globals.get(\"TEST_TITLE\"),",
+							"                \"public\": true,",
+							"                \"text\": pm.globals.get(\"TEST_TEXT\")",
+							"            })",
+							"        }",
+							"    }, function (err, response) {",
+							"        var result = response.json().result;",
+							"        pm.globals.set(\"TEST_ENTRY_ID\", parseInt(result));",
+							"        console.log(result);",
+							"    });",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "1237f57e-00de-431e-9f47-960b6b067518",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status is true\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(true);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"{{TEST_TOKEN}}\",\n\t\"id\": {{TEST_ENTRY_ID}}\n}"
 				},
 				"url": {
 					"raw": "http://127.0.0.1:8080/diary/delete",

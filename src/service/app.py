@@ -321,7 +321,7 @@ def diary_create():
             (diary_entry_id, title, username, current_time, public))
             data = {
                 "status": True,
-                "id": diary_entry_id
+                "result": diary_entry_id
             }
             return make_json_response(data, status=201)
         except sqlite3.Error as e:
@@ -344,8 +344,29 @@ def diary_delete():
             return respond_invalid_token()
 
         # Validate diary entry id
+        invalid_id_data = {
+            "status": False,
+            "error": "Invalid diary entry id."
+        }
         try:
-            cursor = "SELECT * FROM diary_entries, tokens,"
+            id = int(id)
+            cursor = get_db().execute(
+            "SELECT * FROM diary_entries WHERE author = ? AND id = ?",
+            [username, id])
+            row = cursor.fetchone()
+            if row is None:
+                # Diary entry id is invalid or does not belong to user
+                return make_json_response(invalid_id_data)
+            else:
+                cursor = get_db().execute(
+                "DELETE FROM diary_entries WHERE author = ? AND id = ? LIMIT 1",
+                [username, id])
+                print("Deleted diary entry (%d, ..., %s, ..., ..., ...)" %
+                (id, username))
+                return make_json_response({"status": True})
+        except ValueError as e:
+            print("Diary entry id is not an integer")
+            return make_json_response(invalid_id_data)
         except sqlite3.Error as e:
             print("sqlite3 error: %s" % e)
 
