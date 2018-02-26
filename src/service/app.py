@@ -110,7 +110,7 @@ def users():
         # Check token validity and if expired
         try:
             cursor = get_db().execute(
-            "SELECT username, fullname, age FROM tokens NATURAL JOIN users WHERE token=? AND expired='false'", [token])
+            "SELECT username, fullname, age FROM tokens NATURAL JOIN users WHERE token=? AND expired=0", [token])
             row = cursor.fetchone()
             if row is not None:
                 data = {
@@ -230,7 +230,7 @@ def users_expire():
         # Expire the token
         try:
             cursor = get_db().execute(
-            "UPDATE tokens SET expired='true' WHERE token=? AND expired='false'", [token])
+            "UPDATE tokens SET expired=1 WHERE token=? AND expired=0", [token])
             if cursor.rowcount == 0:
                 # Token did not exist in database or was already expired
                 return make_json_response({'status': False})
