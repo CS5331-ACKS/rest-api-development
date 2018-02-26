@@ -144,7 +144,7 @@
             contentType: "application/json",
             data : adjust_entry_json,
             dataType: 'json',
-            success: function(data) {
+            success: function(result) {
 
               if (result.status == true)
               {
@@ -154,8 +154,7 @@
               }
               else if (result.status == false)
               {
-                alert("Invalid authentication token.");
-                window.location.href = "index.html";
+               alert("Invalid diary title ID/authentication token");
               }
 
             },

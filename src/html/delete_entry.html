@@ -130,8 +130,7 @@ $(document).ready(function(){
               }
               else if (result.status == false)
               {
-                alert("Invalid authentication token.");
-                window.location.href = "index.html";
+                 alert("Invalid diary title ID/authentication token");
               }
           },
           error: function(xhr, resp, text) {
