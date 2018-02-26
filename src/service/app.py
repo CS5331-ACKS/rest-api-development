@@ -244,7 +244,7 @@ def diary():
             rows = [dict(row) for row in cursor.fetchall()]
             data = {
                 "status": True,
-                "results": rows
+                "result": rows
             }
             return make_json_response(data)
         except sqlite3.Error as e:
@@ -272,7 +272,7 @@ def diary():
             rows = [dict(row) for row in cursor.fetchall()]
             data = {
                 "status": True,
-                "results": rows
+                "result": rows
             }
             return make_json_response(data)
         except sqlite3.Error as e:

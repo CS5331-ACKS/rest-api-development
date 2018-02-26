@@ -15,7 +15,7 @@ CREATE TABLE diary_entries(
   id INTEGER PRIMARY KEY,
   title TEXT NOT NULL,
   author TEXT REFERENCES users(username),
-  public_date TEXT NOT NULL,
+  publish_date TEXT NOT NULL,
   public BOOLEAN NOT NULL,
   "text" TEXT NOT NULL
 )
