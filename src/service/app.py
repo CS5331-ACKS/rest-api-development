@@ -2,6 +2,7 @@
 
 from flask import Flask, request, g
 from flask_cors import CORS
+import bcrypt
 import datetime
 import json
 import os
@@ -182,10 +183,11 @@ def users_register():
         # Attempts to insert the user into the database
         # Raises IntegrityError if username already exists in database
         try:
+            hashed_password = bcrypt.hashpw(password.encode("UTF-8"), bcrypt.gensalt())
             get_db().execute('INSERT INTO users VALUES(?,?,?,?)',
-            [username, password, fullname, age])
+            [username, hashed_password, fullname, age])
             print("Inserted user {%s, %s, %s, %d}" %
-            (username, password, fullname, age))
+            (username, hashed_password, fullname, age))
         except sqlite3.IntegrityError:
             data = {
                 'status': False,
@@ -409,13 +411,21 @@ def diary_permission():
 def authenticate_user(username, password):
     try:
         cursor = get_db().execute(
-        "SELECT * FROM users WHERE username = ? AND password = ?",
-        [username, password])
-        if len(cursor.fetchall()) == 1:
-            print("User successfully authenticated")
-            return True
-        else:
+        "SELECT * FROM users WHERE username = ?",
+        [username])
+        user = cursor.fetchone()
+        if user is None:
+            print("Username is invalid")
             return False
+        else:
+            hashed_password = user["hashed_password"]
+            if bcrypt.hashpw(password.encode("UTF-8"),
+            hashed_password.encode("UTF-8")) == hashed_password:
+                print("User successfully authenticated")
+                return True
+            else:
+                print("Password does not match")
+                return False
     except sqlite3.Error as e:
         print("sqlite3 error: %s" % e)
         return False
