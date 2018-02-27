@@ -14,6 +14,9 @@
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
   <ul class="navbar-nav">
     <li class="nav-item active">
+      <a class="nav-link" id="public_entry_auth" href="#">View public diary entry</a>
+    </li>
+    <li class="nav-item active">
       <a class="nav-link" id="private_entry" href="#">View private diary entry</a>
     </li>
     <li class="nav-item active">
@@ -35,22 +38,6 @@
 
 <html>
 <head>
-
-  <style media="screen" type="text/css">
-  table {
-      width: 50%;
-  }
-  th {
-      background: #f1f1f1;
-      font-weight: bold;
-      padding: 6px;
-  }
-  td {
-      background: #f9f9f9;
-      padding: 6px;
-  }
-  </style>
-</head>
 
 <div class="container py-5">
     <div class="row">
@@ -91,6 +78,19 @@
 </div>
 <!--/container-->
 
+<table class="table" id="mytable">
+<thead>
+<tr>
+  <th>Id</th>
+  <th>Title</th>
+  <th>Author</th>
+  <th>Publish Date</th>
+  <th>Public</th>
+  <th>Text</th>
+</tr>
+</thead>
+</table>
+
 <script type="text/javascript">
 
 $(document).ready(function(){
@@ -126,12 +126,12 @@ $(document).ready(function(){
               if (result.status == true)
               {
                 alert("Diary entry deleted!");
+                location.reload();
 
               }
               else if (result.status == false)
               {
-                alert("Invalid authentication token.");
-                window.location.href = "index.html";
+                 alert("Invalid diary title ID/authentication token");
               }
           },
           error: function(xhr, resp, text) {
@@ -140,6 +140,36 @@ $(document).ready(function(){
       })
 
   });
+
+  $.ajax({
+      url: 'http://localhost:8080/diary',
+      type : "POST",
+      contentType: "application/json",
+      data : formToken,
+      dataType: 'json',
+      success: function(data) {
+
+          if (data.status == false)
+          {
+            alert("Invalid authentication token.");
+            window.location.href = "index.html";
+          }
+
+          for (var i=0; i<data.result.length; i++) {
+              var row = $('<tr><td>' + data.result[i].id + '</td><td>' + data.result[i].title + '</td><td>' + data.result[i].author + '</td><td>' + data.result[i].publish_date + '</td><td>' + data.result[i].public + '</td><td>' + data.result[i].text + '</td><td>' + '</td></tr>');
+              $('#mytable').append(row);
+
+          }
+
+      },
+      error: function(jqXHR, textStatus, errorThrown){
+          alert('Error: ' + textStatus + ' - ' + errorThrown);
+      }
+  });
+
+          $("#public_entry_auth").click(function() {
+          window.location.href = `public_entry_auth.html?${token}`;
+          });
 
           $("#private_entry").click(function() {
           window.location.href = `private_entry.html?${token}`;

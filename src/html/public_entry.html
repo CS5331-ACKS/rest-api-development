@@ -52,8 +52,7 @@ $.ajax({
     success: function(data) {
 
         for (var i=0; i<data.result.length; i++) {
-            var row = $('<tr><td>' + data.result[i].id + '</td><td>' + data.result[i].title + '</td><td>' + data.result[i].author + '</td><td>' + data.result[i].publish_date +'</td><td>' + data.result[i].public + '</td><td>' + data.result[i].text
-            + '</td><td>' + '</td></tr>');
+            var row = $('<tr><td>' + data.result[i].id + '</td><td>' + data.result[i].title + '</td><td>' + data.result[i].author + '</td><td>' + data.result[i].publish_date +'</td><td>' + data.result[i].public + '</td><td>' + data.result[i].text + '</td><td>' + '</td></tr>');
             $('#mytable').append(row);
 
         }
