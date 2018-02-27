@@ -105,10 +105,14 @@ Please fill out this section with details relevant to your team.
 
 #### Question 1: Briefly describe the web technology stack used in your implementation.
 
-Database - Sqlite was used due to its excellent reputation as an embedded
+Back-end tech stack
+- Database - Sqlite was used due to its excellent reputation as an embedded
 database and ease of use.
+- Web Framework - Flask, a python web framework was used.
 
-TODO: Frontend and Flask
+Front-end tech stack
+- Bootstrap - For HTML- and CSS-based design template.
+- jQuery - JavaScript library to perform AJAX calls and DOM manipulation.
 
 #### Question 2: Are there any security considerations your team thought about?
 
