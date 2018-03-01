@@ -34,7 +34,8 @@
                     {
 
                       alert("Login successful!");
-                      window.location.href = `userhome.html?${return_first}`;
+                      window.localStorage.setItem('token', return_first);
+                      window.location.href = 'userhome.html';
                     }
                     else if (response.status == false)
                     {

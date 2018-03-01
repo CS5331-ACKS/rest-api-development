@@ -57,7 +57,7 @@
 
 <script type="text/javascript">
 
-  var token = window.location.search.substr(1);
+  var token = window.localStorage.getItem('token');
   var formToken = `{\"token\": "${token}"}`;
 
 
@@ -88,19 +88,19 @@
           });
 
           $("#public_entry_auth").click(function() {
-            window.location.href = `public_entry_auth.html?${token}`;
+            window.location.href = 'public_entry_auth.html';
           });
 
           $("#create_entry").click(function() {
-          window.location.href = `create_entry.html?${token}`;
+          window.location.href = 'create_entry.html';
           });
 
           $("#delete_entry").click(function() {
-          window.location.href = `delete_entry.html?${token}`;
+          window.location.href = 'delete_entry.html';
           });
 
           $("#adjust_entry").click(function() {
-          window.location.href = `adjust_entry.html?${token}`;
+          window.location.href = 'adjust_entry.html';
           });
 
     $("#logout").on('click', function(){
@@ -118,12 +118,14 @@
                 if (result.status == true)
                 {
                   alert("Successfully logged out!");
+                  window.localStorage.removeItem('token');
                   window.location.href = "index.html";
 
                 }
                 else if (result.status == false)
                 {
                   alert("Already logged out!");
+                  window.localStorage.removeItem('token');
                   window.location.href = "index.html";
                 }
             },
