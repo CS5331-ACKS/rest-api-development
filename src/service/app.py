@@ -327,7 +327,9 @@ def diary_create():
             (diary_entry_id, title, username, current_time, public))
             data = {
                 "status": True,
-                "result": diary_entry_id
+                "result": {
+                    "id": diary_entry_id
+                }
             }
             return make_json_response(data, status=201)
         except sqlite3.Error as e:
