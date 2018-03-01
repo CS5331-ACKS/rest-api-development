@@ -24,19 +24,19 @@
                 dataType : 'json', // data type
                 data : formData,
                 contentType: "application/json",
-                success : function(result) {
+                success : function(response) {
 
-                    console.log(result);
-                    return_first = result.token;
+                    console.log(response);
+                    return_first = response.result.token;
                     //callback(result.token);
 
-                    if (result.status == true)
+                    if (response.status == true)
                     {
 
                       alert("Login successful!");
                       window.location.href = `userhome.html?${return_first}`;
                     }
-                    else if (result.status == false)
+                    else if (response.status == false)
                     {
                       alert("Login failed. Please try again.");
 

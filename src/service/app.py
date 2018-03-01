@@ -143,9 +143,11 @@ def users():
             if row is not None:
                 data = {
                     "status": True,
-                    "username": row["username"],
-                    "fullname": row["fullname"],
-                    "age": row["age"]
+                    "result": {
+                        "username": row["username"],
+                        "fullname": row["fullname"],
+                        "age": row["age"]
+                    } 
                 }
                 return make_json_response(data)
             else:
@@ -216,7 +218,9 @@ def users_authenticate():
                 # Authentication successful response
                 data = {
                     "status": True,
-                    "token": token
+                    "result": {
+                        "token": token
+                    }
                 }
                 return make_json_response(data)
 
