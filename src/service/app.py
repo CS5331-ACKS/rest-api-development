@@ -237,11 +237,6 @@ def users_expire():
         if None in [token]:
             return respond_missing_params()
 
-        # Validate UUIDv4 token and check if token is not expired
-        is_token_valid, username = validate_token(token)
-        if not is_token_valid:
-            return respond_invalid_token()
-
         # Expire the token
         try:
             cursor = get_db().execute(
