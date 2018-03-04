@@ -14,7 +14,9 @@ app = Flask(__name__)
 CORS(app)
 
 # Remember to update this list
-ENDPOINT_LIST = ['/', '/meta/heartbeat', '/meta/members']
+ENDPOINT_LIST = ['/', '/meta/heartbeat', '/meta/members', '/users', 
+                 '/users/register', '/users/authenticate', '/users/expire', 
+                 '/diary', '/diary/create', '/diary/delete', '/diary/permission']
 
 DATABASE = 'database.db'
 
