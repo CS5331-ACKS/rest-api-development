@@ -103,7 +103,11 @@ TODO
 
 #### Question 5: Is your web application vulnerable? If yes, how and why? If not, what measures did you take to secure it?
 
-TODO
+The web application is vulnerable to a few attacks.
+
+1. Vulnerable to account bruteforce attack as account lockout mechanism was not implemented.
+2. Vulnerable to sensitive data exposure and potential man in the middle attack as network traffic between client and server is unencrypted.
+3. Vulnerable to potential DoS attack as rate limiting mechanism is not implemented.
 
 #### Feedback: Is there any other feedback you would like to give?
 
@@ -112,7 +116,7 @@ Nope :smile:
 ### Declaration
 
 1. Andy Tan Guan Ming
-    - Implemented frontend for login, registration and public diary entries
+    - Implemented frontend for 'login', 'registration', 'view public diary entries', 'view authenticated diary entries' and 'create diary entry'
 2. Zhu Chunqi
     - Designed the database schema for `users` table
     - Implemented the `/users/*` endpoints
