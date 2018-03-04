@@ -122,11 +122,12 @@ Nope :smile:
 ### Declaration
 
 1. Andy Tan Guan Ming
-    - Implemented frontend for 'login', 'registration', 'view public diary entries', 'view authenticated diary entries' and 'create diary entry'
+    - Wrote frontend queries to backend for 'login', 'registration', 'view public diary entries', 'view authenticated diary entries' and 'create diary entry'
 2. Zhu Chunqi
     - Designed the database schema for `users` table
     - Implemented the `/users/*` endpoints
 3. Lu Yang Kenneth
-    - TODO
+    - Implemented authentication on each page and design of frontend
+    - Organised README and documents for submission
 4. Ng Si Kai
     - TODO
