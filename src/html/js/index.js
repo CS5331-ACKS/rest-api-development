@@ -26,17 +26,17 @@
                 contentType: "application/json",
                 success : function(response) {
 
-                    console.log(response);
-                    return_first = response.result.token;
+                    //console.log(response);
                     //callback(result.token);
 
                     if (response.status == true)
                     {
-
+                      return_first = response.result.token;
                       alert("Login successful!");
                       window.localStorage.setItem('token', return_first);
                       window.location.href = 'userhome.html';
                     }
+
                     else if (response.status == false)
                     {
                       alert("Login failed. Please try again.");
