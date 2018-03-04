@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Secret Diary: My Entries</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="/js/jquery/jquery.min.js"></script>
+  <script src="/js/bootstrap/bootstrap.min.js"></script>
+  <script src="/js/bootstrap/bootstrap-table.min.js"></script>
+  <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css"/>
+  <link rel="stylesheet" href="/css/bootstrap/bootstrap-table.min.css"/>
+
+  <script type="text/javascript">var authUser;</script>
+  <script src="/js/auth.js"></script>
+</head>
+
+<body class="pt-5">
+  <nav class="navbar fixed-top navbar-expand-sm bg-dark navbar-dark">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="navbar-brand" href="">Secret Diary</a>
+      </li>
+    </ul>
+
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="public_entries.html">Public Entries</a>
+      </li>
+    </ul>
+
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="private_entries.html">My Entries</a>
+      </li>
+    </ul>
+
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="create_entry.html">New Entry</a>
+      </li>
+    </ul>
+
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="#" id="logout">Logout</a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="container-fluid py-5">
+    <div class="row">
+
+      <!-- private entries -->
+      <div class="col-sm-10 mx-auto">
+        <h1 class="text-left pb-4">My Entries</h1>
+
+        <!-- TODO make into cards -->
+        <table class="table" id="private_entries">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Publish Date</th>
+              <th>Public</th>
+              <th>Text</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</body>
+
+<script type="text/javascript">
+  verifyLoggedIn();
+
+  var data = `{"token": "${authUser.token}"}`;
+
+  $.ajax({
+    url: "http://localhost:8080/diary",
+    type: "POST",
+    dataType: "json",
+    data: data,
+    contentType: "application/json",
+
+    success: function(response) {
+      console.log(response);
+
+      if (response.status == true) {
+        for (var i = 0; i < response.result.length; i++) {
+          var entry = response.result[i];
+
+          var adjustButton;
+          if (entry.public) {
+            adjustButton = `<button type="button" class="adjust btn btn-sm btn-info" onclick="adjustEntry(${entry.id}, false)">Make Private</button>`;
+          } else {
+            adjustButton = `<button type="button" class="adjust btn btn-sm btn-warning" onclick="adjustEntry(${entry.id}, true)">Make Public</button>`;
+          }
+
+          var deleteButton = `<button type="button" class="delete btn btn-sm btn-danger" onclick="deleteEntry(${entry.id})">Delete</button>`;
+
+          var rowString = `<tr>
+                             <td>${entry.id}</td>
+                             <td>${entry.title}</td>
+                             <td>${entry.author}</td>
+                             <td>${entry.publish_date}</td>
+                             <td>${entry.public}<br>${adjustButton}</td>
+                             <td>${entry.text}</td>
+                             <td>${deleteButton}</td>
+                           </tr>`;
+
+          var row = $(rowString);
+          $("#private_entries").append(row);
+        }
+      } else if (response.status == false) {
+        alert("Invalid authentication token.");
+      }
+    },
+
+    error: function(xhr, resp, text) {
+      console.log(xhr, resp, text);
+    }
+  });
+
+  var deleteEntry = function(entryId) {
+    var deleteJson = `{"token": "${authUser.token}", "id": ${entryId}}`;
+
+    $.ajax({
+      url: "http://localhost:8080/diary/delete",
+      type: "POST",
+      dataType: "json",
+      data: deleteJson,
+      contentType: "application/json",
+
+      success: function(response) {
+        console.log(response);
+
+        if (response.status == true) {
+          alert("Diary entry deleted!");
+          window.location.reload();
+        } else if (response.status == false) {
+          alert("Invalid diary title ID/authentication token");
+        }
+      },
+
+      error: function(xhr, resp, text) {
+        console.log(xhr, resp, text);
+      }
+    });
+  };
+
+  var adjustEntry = function(entryId, publicVar) {
+      var adjustJson = `{"token": "${authUser.token}", "id": ${entryId}, "public": ${publicVar}}`;
+
+      $.ajax({
+        url: "http://localhost:8080/diary/permission",
+        type: "POST",
+        dataType: "json",
+        data: adjustJson,
+        contentType: "application/json",
+
+        success: function(response) {
+          console.log(response);
+
+          if (response.status == true) {
+            alert("Diary entry permission adjusted!");
+            window.location.reload();
+          } else if (response.status == false) {
+            alert("Invalid diary title ID/authentication token");
+          }
+        },
+
+        error: function(xhr, resp, text) {
+          console.log(xhr, resp, text);
+        }
+      });
+    };
+</script>
+</html>
