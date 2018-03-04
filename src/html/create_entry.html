@@ -1,188 +1,127 @@
-<link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css"/>
-<link rel="stylesheet" href="/css/bootstrap/bootstrap-table.min.css"/>
-<script src="/js/jquery/jquery.min.js"></script>
-<script src="/js/bootstrap/bootstrap.min.js"></script>
-<script src="/js/bootstrap/bootstrap-table.min.js"></script>
-
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <title>Secret Diary: New Entry</title>
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="/js/jquery/jquery.min.js"></script>
+  <script src="/js/bootstrap/bootstrap.min.js"></script>
+  <script src="/js/bootstrap/bootstrap-table.min.js"></script>
+  <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css"/>
+  <link rel="stylesheet" href="/css/bootstrap/bootstrap-table.min.css"/>
+
+  <script type="text/javascript">var authUser;</script>
+  <script src="/js/auth.js"></script>
 </head>
-<body>
 
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-  <ul class="navbar-nav">
-    <li class="nav-item active">
-      <a class="nav-link" id="public_entry_auth" href="#">View public diary entry</a>
-    </li>
-    <li class="nav-item active">
-      <a class="nav-link" id="private_entry" href="#">View private diary entries</a>
-    </li>
-    <li class="nav-item active">
-      <a class="nav-link" id="delete_entry" href="#">Delete existing diary entry</a>
-    </li>
-    <li class="nav-item active">
-      <a class="nav-link" id="adjust_entry" href="#">Adjust diary entry permissions</a>
-    </li>
-  </ul>
-  <ul class="nav navbar-nav ml-auto">
-    <li class="nav-item active">
-      <a class="nav-link" id="logout" href="#">Logout</a>
-    </li>
-  </ul>
-</nav>
-</body>
-</html>
+<body class="pt-5">
+  <nav class="navbar fixed-top navbar-expand-sm bg-dark navbar-dark">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="navbar-brand" href="index.html">Secret Diary</a>
+      </li>
+    </ul>
 
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="public_entries.html">Public Entries</a>
+      </li>
+    </ul>
 
-<html>
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="private_entries.html">My Entries</a>
+      </li>
+    </ul>
 
-<div class="container py-5">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="create_entry.html">New Entry</a>
+      </li>
+    </ul>
+
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="registration.html">Register</a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="#" id="logout">Logout</a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="container-fluid py-5">
     <div class="row">
-        <div class="col-md-12">
-            <div class="row">
-                <div class="col-md-6 mx-auto">
-                    <span class="anchor" id="formCreate"></span>
-                    <!-- form card login -->
-                    <div class="card rounded-0">
-                        <div class="card-header">
-                            <h3 class="mb-0">Create new diary entry</h3>
-                        </div>
 
-                        <div class="card-body">
-                            <form class="form" role="form" autocomplete="off" id="formCreateDiary" method="post">
-                                <div class="form-group">
-                                    <label>Title</label>
-                                    <input type="text" class="form-control form-control-lg rounded-0" name="title" id="titleId" placeholder="Input diary title here" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Text</label>
-                                    <input type="text" class="form-control form-control-lg rounded-0" name="text" id="textId" placeholder="Input diary text here" required>
-                                </div>
-                                    <input type="submit" id="submit" class="btn btn-success btn-lg float-right" value="Submit">
+      <!-- create diary entry form -->
+      <div class="col-sm-8 col-md-6 mx-auto">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="mb-0">New Entry</h3>
+          </div>
 
-                            </form>
-                        </div>
-                        <!--/card-block-->
-                    </div>
-                    <!-- /form card login -->
+          <div class="card-body">
+            <form class="form" role="form" autocomplete="off">
+              <div class="form-group">
+                <label>Title</label>
+                <input type="text" class="form-control" id="entry_title" required>
+              </div>
 
-                </div>
+              <div class="form-group">
+                <label>Text</label>
+                <input type="text" class="form-control" id="entry_text" required>
+              </div>
 
-
-            </div>
-            <!--/row-->
-
+              <input type="submit" id="submit" class="btn btn-success float-right" value="Create">
+            </form>
+          </div>
         </div>
-        <!--/col-->
+      </div>
+
     </div>
-    <!--/row-->
-</div>
-<!--/container-->
+  </div>
+</body>
 
 <script type="text/javascript">
-
-$(document).ready(function(){
-
-  var token = window.localStorage.getItem('token');
-  var formToken = `{\"token\": "${token}"}`;
-
-  $("#submit").on('click', function(e){
-
+  $("#submit").on("click", function(e) {
     e.preventDefault();
     e.returnValue = false;
 
-    var titleVar = document.getElementById("titleId").value;
-    var textVar = document.getElementById("textId").value;
-    var create_entry_json =  `{\"token\": "${token}",\"title\": "${titleVar}",\"public\": false,\"text\": "${textVar}"}`;
+    var titleVar = document.getElementById("entry_title").value;
+    var textVar = document.getElementById("entry_text").value;
 
-    if (document.getElementById("titleId").value == "" || document.getElementById("textId").value == "")
-    {
+    if (titleVar == "" || textVar == "") {
       alert("Please fill up all the fields");
       return;
     }
-      // send ajax
-      $.ajax({
-          url: 'http://localhost:8080/diary/create', // url where to submit the request
-          type : "POST", // type of action POST || GET
-          dataType : 'json', // data type
-          data : create_entry_json,
-          contentType: "application/json",
-          success : function(result) {
 
-              console.log(result);
+    var entryJson = `{"token": "${authUser.token}", "title": "${titleVar}", "public": false, "text": "${textVar}"}`;
 
-              if (result.status == true)
-              {
-                alert("New diary entry created!");
+    $.ajax({
+      url: "http://localhost:8080/diary/create",
+      type: "POST",
+      dataType: "json",
+      data: entryJson,
+      contentType: "application/json",
 
-              }
-              else if (result.status == false)
-              {
-                alert("Invalid authentication token.");
-                window.location.href = "index.html";
-              }
-          },
-          error: function(xhr, resp, text) {
-              console.log(xhr, resp, text);
-          }
-      })
+      success: function(response) {
+        console.log(response);
 
+        if (response.status == true) {
+          alert("New diary entry created!");
+          window.location.reload();
+        } else if (response.status == false) {
+          alert("Invalid authentication token.");
+        }
+      },
 
-  });
-          $("#public_entry_auth").click(function() {
-          window.location.href = 'public_entry_auth.html';
-          });
-
-          $("#private_entry").click(function() {
-          window.location.href = 'private_entry.html';
-          });
-
-          $("#delete_entry").click(function() {
-          window.location.href = 'delete_entry.html';
-          });
-
-          $("#adjust_entry").click(function() {
-          window.location.href = 'adjust_entry.html';
-          });
-
-    $("#logout").on('click', function(){
-
-        // send ajax
-        $.ajax({
-            url: 'http://localhost:8080/users/expire', // url where to submit the request
-            type : "POST", // type of action POST || GET
-            dataType : 'json', // data type
-            data : formToken,
-            contentType: "application/json",
-            success : function(result) {
-
-                console.log(result);
-
-                if (result.status == true)
-                {
-                  alert("Successfully logged out!");
-                  window.localStorage.removeItem('token');
-                  window.location.href = "index.html";
-
-                }
-                else if (result.status == false)
-                {
-                  alert("Already logged out!");
-                  window.localStorage.removeItem('token');
-                  window.location.href = "index.html";
-                }
-            },
-            error: function(xhr, resp, text) {
-                console.log(xhr, resp, text);
-            }
-        })
-
-
+      error: function(xhr, resp, text) {
+        console.log(xhr, resp, text);
+      }
     });
   });
 </script>
-
-
 </html>
