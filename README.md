@@ -62,11 +62,20 @@ If a response is received, you're good to go.
 
 ## Screenshots
 
-TODO
+### Register
+![Register](./img/register.png)
 
-Please replace the example screenshots with screenshots of your completed project. Feel free to include more than one.
+### Login
+![Login](./img/login.png)
 
-![Sample Screenshot](./img/samplescreenshot.png)
+### View Public Entries
+![View Public Entries](./img/public_entries.png)
+
+### View Private Entries
+![View Private Entries](./img/private_entries.png)
+
+### Create New Entry
+![Create New Entry](./img/create_entry.png)
 
 ## Administration and Evaluation
 
