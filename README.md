@@ -91,7 +91,11 @@ Front-end tech stack
 
 #### Question 2: Are there any security considerations your team thought about?
 
-TODO
+We have thought about security when implementing the API and web application.
+- SSL should be implemented to provide confidentiality, integrity and authentication for network data between client and server.
+- Input validation should be implemented to prevent potential injection attacks. e.g. SQL injection, XSS. Command injection and etc.
+- Strong user account policy should be implemented. e.g. account lockout, minimum password length, password complexity and etc.
+- Access control was implemented. To ensure that authenticated users will not be able to perform horizontal privilege escalation.
 
 #### Question 3: Are there any improvements you would make to the API specification to improve the security of the web application?
 
@@ -103,11 +107,13 @@ TODO
 
 #### Question 5: Is your web application vulnerable? If yes, how and why? If not, what measures did you take to secure it?
 
-The web application is vulnerable to a few attacks.
+The web application is vulnerable.
 
-1. Vulnerable to account bruteforce attack as account lockout mechanism was not implemented.
-2. Vulnerable to sensitive data exposure and potential man in the middle attack as network traffic between client and server is unencrypted.
-3. Vulnerable to potential DoS attack as rate limiting mechanism is not implemented.
+1. Account lockout mechanism was not implemented. This would result in successful account bruteforce attack, leading to account compromise.
+2. Minimum password length not implemented. A short password length would be require less effort and difficulty to compromise.
+3. Vulnerable to eavesdropping and man in the middle attack. This would result in sensitive data exposure and potential integrity impact. This is because the network traffic between client and server is unencrypted.
+4. Vulnerable to potential DoS attack as rate limiting mechanism is not implemented.
+5. Absolute session timeout was not implemented. Session token would still be valid unless the expire endpoint is called. This may increase the probability of an attacker hijacking the session and impersonate the victim.
 
 #### Feedback: Is there any other feedback you would like to give?
 
