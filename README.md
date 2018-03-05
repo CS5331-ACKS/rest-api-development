@@ -100,15 +100,18 @@ Front-end tech stack
 
 #### Question 2: Are there any security considerations your team thought about?
 
-We have thought about security when implementing the API and web application.
+We have thought about security when implementing the API and web application. However, not all of the higlighted considerations were implemented due to time restriction.
 - SSL should be implemented to provide confidentiality, integrity and authentication for network data between client and server.
-- Input validation should be implemented to prevent potential injection attacks. e.g. SQL injection, XSS. Command injection and etc.
+- Input validation should be implemented to prevent potential injection attack such as SQL injection, XSS, Command injection and etc.
+- Session management should be implemented in order to reduce the probability of session hijacking attack. e.g. Setting absolute timeout.
 - Strong user account policy should be implemented. e.g. account lockout, minimum password length, password complexity and etc.
-- Access control was implemented. To ensure that authenticated users will not be able to perform horizontal privilege escalation.
+- Access control was implemented so as to ensure that authenticated users will not be able to perform horizontal privilege escalation.
+- A whitelist of specific HTTP methods should be implemented for each endpoint in order to prevent potential abuse.
+- Content security policy should be implemented as an additional layer of defense for content injection attacks.
 
 #### Question 3: Are there any improvements you would make to the API specification to improve the security of the web application?
 
-TODO
+
 
 #### Question 4: Are there any additional features you would like to highlight?
 
@@ -119,10 +122,10 @@ TODO
 The web application is vulnerable.
 
 1. Account lockout mechanism was not implemented. This would result in successful account bruteforce attack, leading to account compromise.
-2. Minimum password length not implemented. A short password length would be require less effort and difficulty to compromise.
-3. Vulnerable to eavesdropping and man in the middle attack. This would result in sensitive data exposure and potential integrity impact. This is because the network traffic between client and server is unencrypted.
-4. Vulnerable to potential DoS attack as rate limiting mechanism is not implemented.
-5. Absolute session timeout was not implemented. Session token would still be valid unless the expire endpoint is called. This may increase the probability of an attacker hijacking the session and impersonate the victim.
+2. Minimum password length not implemented. A short password length would require less effort to compromise an account.
+3. Vulnerable to eavesdropping and man in the middle attack. This would result in sensitive data exposure and potential integrity impact as the network traffic between client and server is unencrypted.
+4. Vulnerable to potential DoS attack as rate limiting mechanism was not implemented.
+5. Absolute session timeout was not implemented. Session token would still be valid unless the 'expire' endpoint is called. This may increase the probability of an attacker hijacking the session and impersonate the victim.
 
 #### Feedback: Is there any other feedback you would like to give?
 
@@ -132,6 +135,7 @@ Nope :smile:
 
 1. Andy Tan Guan Ming
     - Wrote frontend queries to backend for 'login', 'registration', 'view public diary entries', 'view authenticated diary entries' and 'create diary entry'
+    - Answered questions in README
 2. Zhu Chunqi
     - Designed the database schema for `users` table
     - Implemented the `/users/*` endpoints
