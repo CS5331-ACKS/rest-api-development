@@ -143,4 +143,5 @@ Nope :smile:
     - Implemented authentication on each page and design of frontend
     - Organised README and documents for submission
 4. Ng Si Kai
-    - TODO
+    - Refactored all API endpoints to conform to new specifications
+    - Implemented persistence of auth token in browser localstorage
