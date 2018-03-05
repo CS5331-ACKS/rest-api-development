@@ -111,11 +111,13 @@ We have thought about security when implementing the API and web application. Ho
 
 #### Question 3: Are there any improvements you would make to the API specification to improve the security of the web application?
 
-
+- The authentication token could be implemented as a Authorization HTTP header such that it is easier to program against and prevents accidental leaking of the authentication token.
+- HTTPS and HSTS should be enabled on the API endpoint server.
+- The API specification should be clearer with regards of the authorization provided by the token. For example, adjusting diary permission was not explicitly stated whether the user associated with the authenticated session is authorized to edit the permissions of a diary entry belonging to another user. Ambiguity should be avoided as much as possible.
 
 #### Question 4: Are there any additional features you would like to highlight?
 
-TODO
+- The API response always tries to provide informative error responses wherever possible so that the frontend may provide useful feedback to the user.
 
 #### Question 5: Is your web application vulnerable? If yes, how and why? If not, what measures did you take to secure it?
 
@@ -137,8 +139,8 @@ Nope :smile:
     - Wrote frontend queries to backend for 'login', 'registration', 'view public diary entries', 'view authenticated diary entries' and 'create diary entry'
     - Answered questions in README
 2. Zhu Chunqi
-    - Designed the database schema for `users` table
-    - Implemented the `/users/*` endpoints
+    - Designed the database schema
+    - Implemented the REST API endpoints
 3. Lu Yang Kenneth
     - Implemented authentication on each page and design of frontend
     - Organised README and documents for submission

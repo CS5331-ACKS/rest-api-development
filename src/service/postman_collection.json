@@ -12,7 +12,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "20110b3f-47dd-4f14-83ab-a83be511cac2",
+						"id": "9b19b812-3e5b-4ba3-9f07-f149f6f11952",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -24,7 +24,15 @@
 							"    pm.expect(jsonData.result).to.eql([",
 							"        \"/\",",
 							"        \"/meta/heartbeat\",",
-							"        \"/meta/members\"",
+							"        \"/meta/members\",",
+							"        \"/users\",",
+							"        \"/users/register\",",
+							"        \"/users/authenticate\",",
+							"        \"/users/expire\",",
+							"        \"/diary\",",
+							"        \"/diary/create\",",
+							"        \"/diary/delete\",",
+							"        \"/diary/permission\"",
 							"    ]);",
 							"});"
 						]
@@ -365,7 +373,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f017ae64-4d3a-4a72-b387-f36e36abbdae",
+						"id": "bb170841-3038-4636-b879-a21c73346f98",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -379,7 +387,7 @@
 							"",
 							"pm.test(\"Token is correct length (36)\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.token.length).to.eql(36);",
+							"    pm.expect(jsonData.result.token.length).to.eql(36);",
 							"});"
 						]
 					}
@@ -524,7 +532,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "4eb85852-66d6-4cd2-8288-9c287f144311",
+						"id": "9e01cb00-e6c5-423c-bd17-1a6e2a0e4618",
 						"type": "text/javascript",
 						"exec": [
 							"pm.sendRequest({",
@@ -539,7 +547,7 @@
 							"        })",
 							"    }",
 							"}, function (err, response) {",
-							"    var token = response.json().token;",
+							"    var token = response.json().result.token;",
 							"    pm.globals.set(\"TEST_EXPIRED_TOKEN\", token);",
 							"    console.log(\"Authenticated token: \" + token);",
 							"    ",
@@ -633,7 +641,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "444aff8d-c4e2-4214-a0fd-f2f2a35933dc",
+						"id": "f1b95558-10de-40b5-ac15-a9f2e650dea8",
 						"type": "text/javascript",
 						"exec": [
 							"pm.sendRequest({",
@@ -648,7 +656,7 @@
 							"        })",
 							"    }",
 							"}, function (err, response) {",
-							"    var token = response.json().token;",
+							"    var token = response.json().result.token;",
 							"    pm.globals.set(\"TEST_TOKEN\", token);",
 							"    console.log(token);",
 							"});"
@@ -763,7 +771,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "27aad6c2-68e9-43a5-afd8-66ee590e1f25",
+						"id": "452a5246-b1ec-4d45-8fad-289ffddfcbaf",
 						"type": "text/javascript",
 						"exec": [
 							"pm.sendRequest({",
@@ -778,7 +786,7 @@
 							"        })",
 							"    }",
 							"}, function (err, response) {",
-							"    var token = response.json().token;",
+							"    var token = response.json().result.token;",
 							"    pm.globals.set(\"TEST_EXPIRED_TOKEN\", token);",
 							"    console.log(\"Authenticated token: \" + token);",
 							"    ",
@@ -836,7 +844,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "abe890d2-19b1-4b02-b0f1-6a95693b4064",
+						"id": "91dfb7e9-f62e-49d5-b0b6-38b2c52bb1fb",
 						"type": "text/javascript",
 						"exec": [
 							"pm.sendRequest({",
@@ -851,7 +859,7 @@
 							"        })",
 							"    }",
 							"}, function (err, response) {",
-							"    var token = response.json().token;",
+							"    var token = response.json().result.token;",
 							"    pm.globals.set(\"TEST_TOKEN\", token);",
 							"    console.log(token);",
 							"});"
@@ -861,7 +869,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7a33e53f-8719-42ee-9125-e4d82727ebe6",
+						"id": "a929fc10-56c2-4529-b1d5-e82f31b48ecc",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -875,9 +883,9 @@
 							"",
 							"pm.test(\"User attributes are correct\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.username).to.eql(pm.globals.get(\"TEST_USER\"));",
-							"    pm.expect(jsonData.fullname).to.eql(pm.globals.get(\"TEST_FULLNAME\"));",
-							"    pm.expect(jsonData.age).to.eql(parseInt(pm.globals.get(\"TEST_AGE\")));",
+							"    pm.expect(jsonData.result.username).to.eql(pm.globals.get(\"TEST_USER\"));",
+							"    pm.expect(jsonData.result.fullname).to.eql(pm.globals.get(\"TEST_FULLNAME\"));",
+							"    pm.expect(jsonData.result.age).to.eql(parseInt(pm.globals.get(\"TEST_AGE\")));",
 							"});"
 						]
 					}
@@ -1082,7 +1090,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "cebc1dd2-4cdf-4ad1-8104-ca5789ce2686",
+						"id": "8caa03ea-bb7d-43ae-8c4a-b3fab6efbdde",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 201\", function () {",
@@ -1094,9 +1102,9 @@
 							"    pm.expect(jsonData.status).to.eql(true);",
 							"});",
 							"",
-							"pm.test(\"Result is an integer\", function () {",
+							"pm.test(\"result.id is an integer\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(Number.isInteger(jsonData.result)).to.eql(true);",
+							"    pm.expect(Number.isInteger(jsonData.result.id)).to.eql(true);",
 							"});",
 							""
 						]
@@ -1105,7 +1113,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "0f64dc7c-cb3d-4501-be96-54e3c9386ae9",
+						"id": "6392cf81-6a54-4991-8650-97375fcd6cac",
 						"type": "text/javascript",
 						"exec": [
 							"pm.sendRequest({",
@@ -1120,7 +1128,7 @@
 							"        })",
 							"    }",
 							"}, function (err, response) {",
-							"    var token = response.json().token;",
+							"    var token = response.json().result.token;",
 							"    pm.globals.set(\"TEST_TOKEN\", token);",
 							"    console.log(token);",
 							"});"
@@ -1271,7 +1279,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "50fe0826-dea1-492e-844e-42bd41c5a37e",
+						"id": "9c9a3152-309a-4d31-9e7d-960e18b01525",
 						"type": "text/javascript",
 						"exec": [
 							"pm.sendRequest({",
@@ -1286,7 +1294,7 @@
 							"        })",
 							"    }",
 							"}, function (err, response) {",
-							"    var token = response.json().token;",
+							"    var token = response.json().result.token;",
 							"    pm.globals.set(\"TEST_TOKEN\", token);",
 							"    console.log(token);",
 							"});"
@@ -1353,7 +1361,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "f1dd511a-c520-4804-80f2-99ce0fbf9ab9",
+						"id": "53660222-102d-4bd6-9a0f-860c17f0bc63",
 						"type": "text/javascript",
 						"exec": [
 							"pm.sendRequest({",
@@ -1368,7 +1376,7 @@
 							"        })",
 							"    }",
 							"}, function (err, response) {",
-							"    var token = response.json().token;",
+							"    var token = response.json().result.token;",
 							"    pm.globals.set(\"TEST_TOKEN\", token);",
 							"    console.log(token);",
 							"    ",
@@ -1386,7 +1394,7 @@
 							"            })",
 							"        }",
 							"    }, function (err, response) {",
-							"        var result = response.json().result;",
+							"        var result = response.json().result.id;",
 							"        pm.globals.set(\"TEST_ENTRY_ID\", parseInt(result));",
 							"        console.log(result);",
 							"    });",
@@ -1596,7 +1604,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "61810e28-9e4b-4d9e-af8a-3b1000de81c6",
+						"id": "a7c9c084-953b-4330-8758-a7e712cb7406",
 						"type": "text/javascript",
 						"exec": [
 							"pm.sendRequest({",
@@ -1611,7 +1619,7 @@
 							"        })",
 							"    }",
 							"}, function (err, response) {",
-							"    var token = response.json().token;",
+							"    var token = response.json().result.token;",
 							"    pm.globals.set(\"TEST_TOKEN\", token);",
 							"    console.log(token);",
 							"});"
@@ -1800,7 +1808,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "3d2bb120-14e9-49d3-9391-e31330a22d50",
+						"id": "4e418ad3-8a86-405c-a00b-7bfe5c3bc0a6",
 						"type": "text/javascript",
 						"exec": [
 							"pm.sendRequest({",
@@ -1815,7 +1823,7 @@
 							"        })",
 							"    }",
 							"}, function (err, response) {",
-							"    var token = response.json().token;",
+							"    var token = response.json().result.token;",
 							"    pm.globals.set(\"TEST_TOKEN\", token);",
 							"    console.log(token);",
 							"});"
@@ -1860,7 +1868,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "a8394088-c642-4421-8aeb-47dc02d21540",
+						"id": "0a599db0-1d24-4306-9f91-4a3613ad6009",
 						"type": "text/javascript",
 						"exec": [
 							"pm.sendRequest({",
@@ -1875,7 +1883,7 @@
 							"        })",
 							"    }",
 							"}, function (err, response) {",
-							"    var token = response.json().token;",
+							"    var token = response.json().result.token;",
 							"    pm.globals.set(\"TEST_TOKEN\", token);",
 							"    console.log(token);",
 							"    ",
@@ -1893,7 +1901,7 @@
 							"            })",
 							"        }",
 							"    }, function (err, response) {",
-							"        var result = response.json().result;",
+							"        var result = response.json().result.id;",
 							"        pm.globals.set(\"TEST_ENTRY_ID\", parseInt(result));",
 							"        console.log(result);",
 							"    });",
