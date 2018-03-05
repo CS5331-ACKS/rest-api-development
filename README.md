@@ -101,11 +101,12 @@ Front-end tech stack
 #### Question 2: Are there any security considerations your team thought about?
 
 We have thought about security when implementing the API and web application. However, not all of the higlighted considerations were implemented due to time restriction.
+- Passwords were hashed using `bcrypt` before being stored in the database. If an attacker somehow manages to obtain a database dump, he would not be able to gain knowledge of the plaintext password.
+- Access control was implemented so as to ensure that authenticated users will not be able to perform horizontal privilege escalation.
 - SSL should be implemented to provide confidentiality, integrity and authentication for network data between client and server.
 - Input validation should be implemented to prevent potential injection attack such as SQL injection, XSS, Command injection and etc.
 - Session management should be implemented in order to reduce the probability of session hijacking attack. e.g. Setting absolute timeout.
 - Strong user account policy should be implemented. e.g. account lockout, minimum password length, password complexity and etc.
-- Access control was implemented so as to ensure that authenticated users will not be able to perform horizontal privilege escalation.
 - A whitelist of specific HTTP methods should be implemented for each endpoint in order to prevent potential abuse.
 - Content security policy should be implemented as an additional layer of defense for content injection attacks.
 
@@ -118,17 +119,17 @@ We have thought about security when implementing the API and web application. Ho
 #### Question 4: Are there any additional features you would like to highlight?
 
 - The API response always tries to provide informative error responses wherever possible so that the frontend may provide useful feedback to the user.
-- Automated API tests were written using `Postman`.
+- Automated API tests were written using `Postman`. This increases developer confidence in the correctness of the application.
 
 #### Question 5: Is your web application vulnerable? If yes, how and why? If not, what measures did you take to secure it?
 
 The web application is vulnerable.
 
-1. Account lockout mechanism was not implemented. This would result in successful account bruteforce attack, leading to account compromise.
-2. Minimum password length not implemented. A short password length would require less effort to compromise an account.
-3. Vulnerable to eavesdropping and man in the middle attack. This would result in sensitive data exposure and potential integrity impact as the network traffic between client and server is unencrypted.
-4. Vulnerable to potential DoS attack as rate limiting mechanism was not implemented.
-5. Absolute session timeout was not implemented. Session token would still be valid unless the 'expire' endpoint is called. This may increase the probability of an attacker hijacking the session and impersonate the victim.
+- Account lockout mechanism was not implemented. This would result in successful account bruteforce attack, leading to account compromise.
+- Minimum password length not implemented. A short password length would require less effort to compromise an account.
+- Vulnerable to eavesdropping and man in the middle attack. This would result in sensitive data exposure and potential integrity impact as the network traffic between client and server is unencrypted.
+- Vulnerable to potential DoS attack as rate limiting mechanism was not implemented.
+- Absolute session timeout was not implemented. Session token would still be valid unless the 'expire' endpoint is called. This may increase the probability of an attacker hijacking the session and impersonate the victim.
 
 #### Feedback: Is there any other feedback you would like to give?
 
