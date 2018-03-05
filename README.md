@@ -118,6 +118,7 @@ We have thought about security when implementing the API and web application. Ho
 #### Question 4: Are there any additional features you would like to highlight?
 
 - The API response always tries to provide informative error responses wherever possible so that the frontend may provide useful feedback to the user.
+- Automated API tests were written using `Postman`.
 
 #### Question 5: Is your web application vulnerable? If yes, how and why? If not, what measures did you take to secure it?
 
@@ -137,7 +138,7 @@ Nope :smile:
 
 1. Andy Tan Guan Ming
     - Wrote frontend queries to backend for 'login', 'registration', 'view public diary entries', 'view authenticated diary entries' and 'create diary entry'
-    - Answered questions in README
+    - Answered security-related questions in README
 2. Zhu Chunqi
     - Designed the database schema
     - Implemented the REST API endpoints
